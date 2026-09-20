@@ -1,0 +1,21 @@
+---
+layout: default
+title: 所有记录
+nav: notes
+permalink: /notes/
+description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
+---
+<header class="page-heading"><p class="eyebrow">THE NOTEBOOK</p><h1>所有记录</h1><p>不必每次都写成文章，值得记下就好。</p></header>
+{% assign topics = '笔记,踩坑,随想,生活记录' | split: ',' %}
+<nav class="topics" aria-label="文章分类">{% for topic in topics %}<a href="#{{ topic | uri_escape }}">{{ topic }}</a>{% endfor %}</nav>
+{% for topic in topics %}
+<section class="archive-section" id="{{ topic }}" aria-label="{{ topic }}">
+  <h2>{{ topic }}</h2><ul class="post-list">
+  {% assign matches = site.posts | where: 'category', topic %}
+  {% for post in matches %}<li class="post-item"><time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div></li>{% else %}<li class="empty">还没有这类记录，留待以后慢慢写。</li>{% endfor %}
+  </ul>
+</section>
+{% endfor %}
+{% assign known = '笔记,踩坑,随想,生活记录' | split: ',' %}
+{% assign extra_count = 0 %}{% for post in site.posts %}{% unless known contains post.category %}{% assign extra_count = extra_count | plus: 1 %}{% endunless %}{% endfor %}
+{% if extra_count > 0 %}<section class="archive-section" id="其他"><h2>其他记录</h2><ul class="post-list">{% for post in site.posts %}{% unless known contains post.category %}<li class="post-item"><time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><span class="tag">{{ post.category | default: '其他' | escape }}</span><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div></li>{% endunless %}{% endfor %}</ul></section>{% endif %}

@@ -1,0 +1,16 @@
+---
+layout: default
+nav: home
+---
+<section class="hero" aria-labelledby="hello">
+  <div><p class="eyebrow">YOUNGSHIP / PERSONAL SPACE</p><h1 id="hello">你好，我是<br><span>YoungShip.</span></h1><p class="intro">一个放下想法、留下记录的地方。<br>写笔记，也写生活里不想忘记的小事。</p></div>
+  <aside class="hero-note"><p>这里有学习时的笔记，<br>遇到问题后的记录，<br>以及偶尔冒出来的想法。</p><a class="text-link" href="{{ '/about/' | relative_url }}">关于这个小站 →</a></aside>
+</section>
+<section aria-labelledby="recent">
+  <div class="section-heading"><h2 id="recent">最近写下的 <small>RECENT NOTES</small></h2><a class="text-link" href="{{ '/notes/' | relative_url }}">所有记录 →</a></div>
+  <ul class="post-list">
+  {% for post in site.posts limit: 5 %}
+    <li class="post-item"><time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><span class="tag">{{ post.category | default: '笔记' | escape }}</span><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div></li>
+  {% else %}<li class="empty">还没有公开的文章。下一段记录，慢慢写。</li>{% endfor %}
+  </ul>
+</section>

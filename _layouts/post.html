@@ -1,0 +1,7 @@
+---
+layout: default
+---
+<article>
+  <header class="article-header"><a class="text-link" href="{{ '/notes/' | relative_url }}">← 返回所有记录</a><h1>{{ page.title | escape }}</h1><div class="article-meta"><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y年%m月%d日' }}</time><a href="{{ '/notes/' | relative_url }}#{{ page.category | default: '笔记' | uri_escape }}">{{ page.category | default: '笔记' | escape }}</a>{% for tag in page.tags %}<span>#{{ tag | escape }}</span>{% endfor %}</div></header>
+  <div class="prose">{{ content }}<div class="article-end"><a href="{{ '/notes/' | relative_url }}">← 所有记录</a><a href="{{ '/' | relative_url }}">回到首页</a></div></div>
+</article>
