@@ -6,3 +6,4 @@ vendor/
 .sites-runtime/
 .env
 .env.*
+.local-drafts/

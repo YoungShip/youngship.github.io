@@ -42,6 +42,26 @@ tags: [学习]
 
 附带的「从这里开始，写下第一篇记录」是明确标注的示例/写作说明，可以编辑或删除。
 
+## 在另一台电脑用 Codex 写作
+
+仓库自带 `AGENTS.md` 协作规则和 `.agents/skills/blog-writing/` 写作技能，不依赖原电脑的文件路径。
+
+1. 在新电脑安装 Git，并克隆本仓库到自己选择的目录：
+
+   ```sh
+   git clone https://github.com/YoungShip/youngship.github.io.git
+   ```
+
+2. 在 Codex 中打开克隆出的 `youngship.github.io` 文件夹，再从这个项目开始任务。
+3. 对 Codex 说：`使用 $blog-writing，把以下素材整理成博客草稿，先不要发布。` 如果没有自动识别技能，让它先读取 `AGENTS.md` 和 `.agents/skills/blog-writing/SKILL.md`。
+4. 审核后明确说“发布这篇”。发布需要在新电脑单独通过 Git 凭据管理器或平台连接流程登录具有该仓库写权限的 GitHub 账号；克隆公开仓库和写本地草稿本身不需要写入授权。
+
+如果选择细粒度令牌，只授权本仓库的 Contents 读写和必需的 Metadata 只读，通过受信任的凭据输入界面配置；不要把令牌放进聊天、命令行参数、Git remote URL、文章或 Skill。浏览器后台登录与 Git 命令行认证是分开的，不会随仓库同步。
+
+换电脑开始写作前，先检查本地改动并同步远端最新版本；无本地改动时可使用 `git pull --ff-only`。如提示分叉或冲突，先处理差异，不使用强推覆盖另一台电脑的内容。
+
+默认草稿保存在被 Git 忽略的 `.local-drafts/`，不会上传，也不会自动跨电脑同步。这里的忽略和发布审批只是工作约定，不是加密或强制安全隔离。规则和 Skill 可在 GitHub 仓库中公开读取，但已从 Jekyll 网站输出中排除；公开文章仍在 `_posts/`。
+
 ## 修改资料
 
 - `index.html`：首页介绍。

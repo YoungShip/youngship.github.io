@@ -15,6 +15,9 @@ defaults:
     values:
       layout: post
 exclude:
+  - AGENTS.md
+  - .agents
+  - .local-drafts
   - README.md
   - Gemfile
   - Gemfile.lock

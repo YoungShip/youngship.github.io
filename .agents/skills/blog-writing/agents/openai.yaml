@@ -1,0 +1,4 @@
+interface:
+  display_name: "个人博客写作"
+  short_description: "整理个人笔记与随想，默认保留本地草稿，明确授权后才发布到博客"
+  default_prompt: "使用 $blog-writing 将我的素材整理为博客草稿，先让我审核，不要提交或发布。"
