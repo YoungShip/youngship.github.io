@@ -3,9 +3,12 @@ description: 个人主页，记录、随想与笔记。
 url: https://youngship.github.io
 baseurl: ""
 lang: zh-CN
+google_site_verification: "p0jpdMO47WUZjXzqTtBwzn9TT37Zml2-T7NXW7SRFmE"
 timezone: Asia/Shanghai
 markdown: kramdown
 permalink: /notes/:year/:month/:day/:title/
+plugins:
+  - jekyll-sitemap
 kramdown:
   input: GFM
 defaults:
@@ -14,6 +17,11 @@ defaults:
       type: posts
     values:
       layout: post
+  - scope:
+      path: "admin"
+    values:
+      sitemap: false
+      robots: "noindex, follow"
 exclude:
   - AGENTS.md
   - .agents

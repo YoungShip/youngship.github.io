@@ -77,6 +77,14 @@ Settings → Pages → Deploy from a branch → main → / (root)。使用默认
 
 本地如需完整预览，可安装 Ruby/Jekyll 后使用 GitHub Pages 支持的版本构建；日常写文章不需要本地构建。
 
+## 搜索引擎发现
+
+`jekyll-sitemap` 在每次 GitHub Pages 构建时自动生成 `/sitemap.xml`，`/robots.txt` 声明网站地图地址。公开文章可以被抓取；后台、写作帮助和 404 页不进入网站地图，后台与帮助/404 页面通过 `noindex` 提示搜索引擎不要收录。不要通过 robots.txt 禁止这些 HTML 页的抓取，否则爬虫可能看不到页面上的 `noindex`。
+
+网站地图和提交抓取请求不保证收录或排名。Search Console 需要站主单独验证网站所有权，确认成功后才提交网站地图或请求文章收录。不要把“网站已发布”当作“搜索引擎已收录”。
+
+首页通过 `_config.yml` 中的 `google_site_verification` 输出 Google 所有权验证标记；这是供公开验证的标记，不是登录密码。验证成功后仍需保留，避免失去验证状态。
+
 ## 隐私提醒
 
 网站和源码仓库都公开。不要提交密码、密钥、个人隐私或未公开草稿；`published: false` 只能让网页不展示，不能让公开仓库里的文件变成私密。删除文件后 Git 历史中仍可能保留内容。
