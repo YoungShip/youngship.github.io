@@ -1,0 +1,47 @@
+backend:
+  name: github
+  repo: YoungShip/youngship.github.io
+  branch: main
+  auth_methods: [token]
+
+site_url: https://youngship.github.io
+display_url: https://youngship.github.io
+app_title: YoungShip 写作后台
+media_folder: assets/uploads
+public_folder: /assets/uploads
+publish_mode: simple
+slug:
+  encoding: unicode
+  clean_accents: false
+  sanitize_replacement: '-'
+
+collections:
+  - name: notes
+    label: 我的记录
+    label_singular: 记录
+    description: 保存后会公开到博客和 GitHub 仓库。请勿填写密码、密钥或私人信息。
+    folder: _posts
+    create: true
+    delete: false
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
+    summary: '{{title}} · {{category}}'
+    sortable_fields: [date, title, category]
+    fields:
+      - {label: 标题, name: title, widget: string}
+      - label: 日期
+        name: date
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        hint: 使用今天或过去的日期。未来日期不会立即显示在博客上。
+      - {label: 一句话摘要, name: description, widget: text, hint: 显示在首页和记录列表中。}
+      - label: 分类
+        name: category
+        widget: select
+        options: [笔记, 踩坑, 随想, 生活记录]
+        default: 笔记
+      - {label: 标签, name: tags, widget: list, required: false, hint: 可选，例如学习、读书。}
+      - {label: 正文, name: body, widget: markdown, hint: 可以直接排版，也可以切换到 Markdown 源码。}

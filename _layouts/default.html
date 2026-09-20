@@ -21,7 +21,7 @@
       </nav>
     </header>
     <main id="main" tabindex="-1">{{ content }}</main>
-    <footer class="footer"><span>© {{ 'now' | date: '%Y' }} {{ site.title | escape }}</span><span>记录、随想与笔记 <span aria-hidden="true">/</span> <a href="https://github.com/YoungShip">GitHub</a></span></footer>
+    <footer class="footer"><span>© {{ 'now' | date: '%Y' }} {{ site.title | escape }}</span><span><a href="{{ '/admin/' | relative_url }}">写作后台</a> <span aria-hidden="true">/</span> <a href="{{ '/admin/help/' | relative_url }}">写作说明</a> <span aria-hidden="true">/</span> <a href="https://github.com/YoungShip">GitHub</a></span></footer>
   </div>
 </body>
 </html>

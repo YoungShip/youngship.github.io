@@ -1,0 +1,25 @@
+---
+layout: default
+title: 网页写作说明
+permalink: /admin/help/
+---
+<header class="page-heading"><p class="eyebrow">WRITE / PUBLISH</p><h1>打开网页，就能写。</h1><p>第一次先设置登录；以后从博客页脚的「写作后台」进入。</p></header>
+<div class="prose" style="margin-left:0">
+  <p><a href="/admin/">进入写作后台 →</a></p>
+  <h2>第一次登录</h2>
+  <p>使用 GitHub 的细粒度访问令牌（Fine-grained personal access token），相当于只给这个博客配一把钥匙。它不是 GitHub 登录密码，不要发给别人或写进文章。</p>
+  <ol>
+    <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHub 专用密钥设置</a>，名称可填 <code>YoungShip Blog Writer</code>，选择 90 天有效期。</li>
+    <li>Resource owner 选择 <code>YoungShip</code>。Repository access 选择 <strong>Only select repositories</strong>，只勾选 <code>youngship.github.io</code>。</li>
+    <li>Repository permissions 只添加 <strong>Contents → Read and write</strong>；Metadata 的只读权限由 GitHub 自动添加。无需账户、Actions、工作流或其他仓库权限。</li>
+    <li>由你亲自点击生成并复制密钥。回到后台，选择「使用令牌登录 / Sign In with Token」，粘贴并登录。</li>
+  </ol>
+  <p class="notice">登录后 Sveltia 会把密钥保存在这台设备的浏览器本地存储中，以便下次使用。请只在自己的设备上登录；共用设备使用后退出。密钥到期需重新创建。不要把密钥发到聊天里，也不要提交到仓库。</p>
+  <p>请按上面的说明创建<strong>细粒度</strong>密钥，不使用要求所有仓库权限的 classic token。权限在 GitHub 服务端校验，访问后台地址本身不代表拥有编辑权限。</p>
+  <h2>写一篇记录</h2>
+  <ol><li>进入「我的记录」，新建一篇记录。</li><li>填写标题、日期、一句话摘要、分类和正文。分类可选笔记、踩坑、随想、生活记录。</li><li>检查预览，再保存或发布。后台自动生成 Markdown 文件并提交到 GitHub，网站随后自动更新。</li></ol>
+  <p>本后台采用直接发布方式：保存到仓库的内容就是公开内容。草稿先留在自己的设备里，不要把「未发布」当作隐私保护。</p>
+  <h2>修改已有文章</h2><p>在「我的记录」中打开文章，修改文字后保存即可。为避免误删，后台没有启用删除文章；需要删除时可以到 GitHub 仓库操作。</p>
+  <h2>图片与访问问题</h2><p>正文里的图片会保存到本仓库的 <code>assets/uploads</code>。尽量压缩图片后上传。编辑和发布需要能连接 GitHub API：能打开博客，不一定代表当前网络也能连上编辑服务。若登录失败，先检查密钥是否过期、仓库是否选对、Contents 是否为读写权限。</p>
+  <p><a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener noreferrer">管理或撤销博客密钥</a> · <a href="https://sveltiacms.app/en/docs/backends/github" target="_blank" rel="noopener noreferrer">Sveltia 官方登录说明</a></p>
+</div>
