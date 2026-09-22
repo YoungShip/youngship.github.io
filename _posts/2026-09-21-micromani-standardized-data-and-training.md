@@ -75,6 +75,8 @@ tags: [科研记录, MicroMani, 机器人, 数据采集, ACT, 模仿学习]
 
 *更新后的右腕相机（界面标注 Right Wrist Camera）：右臂工作原点下的夹爪与工装板。*
 
+> **2026-09-23 补充：** 本节中的工作原点截图和相机参考图包含后续补拍/更新，用于说明界面语义和现场布置，不应当作 `standard10` 训练时“移动前相机位姿”的逐帧视觉基准。后续比较相机是否发生变化时，改为直接读取 `E:\data group\micro_assembly_0921_standard10` 中实际保存的视频帧。该修正及 relative ACT 后续实验见：[relative ACT、部署审计与新实验基准](/notes/2026/09/23/micromani-relative-act-new-setup/)。
+
 ## 三、夹爪不是增量控制，而是绝对开度映射
 
 准备正式采集前，我还重新核查了 Omega7 到从手夹爪的映射。

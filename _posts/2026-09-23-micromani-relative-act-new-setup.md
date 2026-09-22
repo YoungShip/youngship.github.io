@@ -1,0 +1,286 @@
+---
+title: "MicroMani 阶段科研记录：relative ACT、部署审计与新实验基准"
+date: "2026-09-23"
+description: "记录 standard10 后续的 relative-state ACT、全窗口部署策略审计、7D→14D 安全适配、Live Dry-Run，以及工作原点和相机布置变化后重新定义实验基准的过程。"
+category: 笔记
+tags: [科研记录, MicroMani, 机器人, ACT, 模仿学习, 数据采集, 部署]
+---
+
+`standard10` 建立以后，问题没有立刻变成“再训练久一点就能真机”。单侧 absolute ACT 虽然比更早的 14 维基线有所改善，但验证误差仍然高于“保持当前 state”的简单对照；与此同时，后续部署审计又暴露出首步预测、夹爪越界和完整控制环频率等问题。
+
+这一阶段因此分成两部分：先把**动作表示和部署语义**查清楚，再处理 2026 年 9 月 23 日出现的**新工作原点与新视觉布置**。本文记录的是离线实验和 dry-run 结果，不把它写成自主抓放已经通过。
+
+## 一、absolute action 仍然不够，先改变动作表示
+
+在统一工作原点、固定 A→B 和单侧 7 维输入输出下，`standard10_single_side_001` 的最佳验证 30 步 normalized L1 约为 **0.217354**，而同一验证集合的“保持当前 state”对照约为 **0.145326**。这说明单纯缩小到单侧并没有解决主要问题。
+
+后续实验把训练目标改为：
+
+```text
+target(t, h) = action(t + h) - observation.state(t)
+```
+
+这里的 relative 并不是相邻帧速度或 `action(t+1)-action(t)`，而是“未来绝对动作目标相对当前观测状态的偏移”。缩放仍使用训练集 absolute action 的标准差，以便重建绝对动作后继续和原来的指标直接比较。
+
+实验目录：
+
+```text
+E:\micro_act_train\experiments\standard10_relative_side_001
+```
+
+训练到 10000 updates 后，最佳检查点出现在 **step 3000**：
+
+| 指标 | relative ACT best@3000 | hold |
+| --- | ---: | ---: |
+| validation first-step L1 | 0.034600 | 0.027419 |
+| validation full-30 L1 | **0.131497** | 0.145326 |
+| train full-30 L1 | 0.125175 | 0.164502 |
+
+relative 表示把验证 full-30 从上一轮 absolute 模型的约 **0.217354** 降到 **0.131497**，但首步仍然弱于 hold。训练继续到 step 10000 后，validation full-30 又回升到约 **0.162005**，因此本轮使用 best@3000，而不是最后一个检查点。
+
+这个结果支持的结论很有限：**relative-state 表示更适合当前数据，但它的优势主要出现在未来轨迹，而不是当前瞬时动作。** 对 2～3 mm 微小零件，约毫米量级的 XYZ 平均误差仍然不能直接解释成“已经能精确抓取”。
+
+## 二、部署前不能只看 46 个固定窗口
+
+训练过程中保存的固定 validation 窗口适合选 checkpoint，但不足以决定 action chunk 应怎样执行。于是又用 best@3000 对两个 validation episode 的全部合法 30 步窗口进行推理，共 **1269 个窗口**。
+
+结果目录：
+
+```text
+E:\micro_act_train\experiments\standard10_relative_side_review_003
+```
+
+### 每次推理后执行多少步
+
+把“重新观察并推理”的间隔设为 K 帧，得到：
+
+| K | normalized L1 |
+| ---: | ---: |
+| 1 | **0.033585** |
+| 2 | 0.038576 |
+| 3 | 0.043379 |
+| 5 | 0.052856 |
+| 10 | 0.073134 |
+| 30 | 0.125839 |
+
+open-loop 越长越差。因此第一版部署不采用“预测 30 步后完整执行”，而是尽量频繁重新观察和重规划。
+
+### chunk 的第一个点也不是最佳选择
+
+逐 horizon 检查显示，offset 0 和 1 的误差仍高于 hold；从 offset 2 开始才逐渐优于 hold。综合预测质量和目标距离，第一版把 **offset=5** 作为候选，即每次预测后取第 6 个目标，约对应 **+167 ms** 的 lookahead。
+
+这不是证明 167 ms 在真实动力学中最优，只是说明在当前离线数据上，“立刻执行 h=0”没有利用到模型真正学到的那部分未来轨迹信息。
+
+### temporal ensemble 没有带来收益
+
+对重叠 chunk 做多组指数加权后，本轮 temporal ensemble 最好的 normalized L1 约为 **0.0381**，仍不如最新 observation 直接重新推理的 **0.0336**。因此第一版不叠加 temporal ensemble，避免在模型本身尚未真机验证时增加额外变量。
+
+## 三、把 7 维模型输出接到 14 维控制接口之前
+
+模型只预测操作者右侧 7 维，也就是：
+
+```text
+operator_right = hardware_left = 原 14D 的 7..13
+```
+
+而 AppStation policy API 接受 14 维 absolute target。因此单独建立了一个部署适配器：
+
+```text
+E:\micro_act_train\experiments\standard10_relative_side_adapter_001
+```
+
+适配逻辑是：
+
+1. 读取当前 14D state；
+2. 用活动侧 `state[7:14]` 和三路图像做推理；
+3. 取 relative chunk 的 offset=5；
+4. 用训练时的 `action_std` 还原相对位移；
+5. 加回当前 active state，得到活动侧绝对目标；
+6. `action[0:7]` 保持当前 inactive side；
+7. `action[7:14]` 写入活动侧目标；
+8. `controlledSides=["right"]`，由 backend 再映射到 hardware-left。
+
+夹爪另设物理保护：
+
+```text
+1.02 mm <= gripper <= 26 mm
+```
+
+并在 backend 单请求限幅之外增加 fail-closed 模型异常门。适配器的离线单元测试 **9/9 通过**，1269 个 validation 窗口回放 **1269/1269 通过**。在 offset=5 的这些窗口里，有 **415/1269** 个原始夹爪目标需要被裁剪到安全范围，这也说明夹爪 clamp 不能依赖模型自行学会。
+
+## 四、Live Dry-Run 验证的是链路，不是真机成功
+
+完成离线适配后，又复用现场已经启动的 HAL、backend 和三路相机进行了 20 个周期的 Live Dry-Run：
+
+```text
+E:\micro_act_train\experiments\standard10_relative_side_live_dryrun_001
+```
+
+20 个周期均为：
+
+```text
+dryRun=true
+sent=false
+```
+
+前后读取到的机械臂 state 完全没有变化，没有发送真实运动。
+
+完整链路的平均耗时约为：
+
+| 环节 | 平均耗时 |
+| --- | ---: |
+| 三路相机并行 snapshot | 11.2 ms |
+| 图像预处理 | 20.2 ms |
+| 模型推理 | 23.8 ms |
+| policy dry-run POST | 11.4 ms |
+| 单周期总耗时 | 74.6 ms |
+
+对应平均完整循环频率约 **13.4 Hz**。这说明单独测到约 24～29 ms 的模型 forward，并不能推出整个现场控制环可以稳定运行在 30 Hz。
+
+这轮 dry-run 只证明三路图像、真实 state、模型、adapter 和 policy bridge 能连起来，并没有证明模型已经具备真实抓放成功率。
+
+## 五、9 月 23 日：实验基准本身发生了变化
+
+当天现场调试过程中，顶部相机和不参与任务的机械臂发生过位移，随后又重新固定；同时软件工作原点 W 也重新记录。
+
+旧 `standard10` 活动侧工作原点 pulse 为：
+
+```text
+[-50002, -200002, -101, 99996, -2, -521]
+```
+
+当前新工作原点为：
+
+```text
+[-24936, 50061, -326, -608, 1, 519]
+```
+
+另一侧也重新建立了参考。由于录制中的 state/action 使用软件工作原点作为任务坐标基准，**新旧 W 不只是“起点换了”，而是数据数值坐标系也变了。**
+
+当前活动侧在新 W 下读取为：
+
+```text
+X=0, Y=0, Z=0
+Roll=0, Pitch=0, Yaw=0
+Gripper=26 mm
+```
+
+因此这套状态很适合作为新的固定任务起点，但不应该直接把旧 standard10 的 normalization 和动作坐标解释原样搬过来。
+
+## 六、相机变化必须用真实训练帧比较
+
+这里还纠正了一个很容易犯的基准错误。
+
+最初曾用科研记录中的工作原点参考图和当前 snapshot 做比较，得到“顶部相机变化很小”的结果。随后确认，那些网页参考图已经包含后续补拍/更新，**不能代表 standard10 训练时的真实视觉输入**。
+
+正确做法是直接从：
+
+```text
+E:\data group\micro_assembly_0921_standard10
+```
+
+读取实际训练视频的第一帧，再与当前 live snapshot 对比。
+
+### standard10 真实 global 第一帧
+
+![standard10 训练视频中的顶部相机第一帧](/assets/uploads/micromani-global-standard10-first-frame-2026-09-23.jpg)
+
+*这里直接使用旧训练数据保存的视频帧作为“移动前”的视觉基准，而不是后补的科研记录截图。*
+
+### 2026-09-23 当前 global 画面
+
+![2026-09-23 当前顶部相机画面](/assets/uploads/micromani-global-current-setup-2026-09-23.jpg)
+
+*当前重新固定后的顶部相机画面。机械臂待机位置也已经发生变化，因此自动仿射只能作为变化量诊断，不能等同于精确相机外参。*
+
+对 10 条旧 episode 第一帧与当前画面做 ORB + RANSAC 仿射诊断，global 得到：
+
+- 画面中心变化中位数约 **16.8 px**；
+- 旋转量中位数约 **2.03°**；
+- scale 中位数约 **0.924**，即约 7～8% 的尺度变化。
+
+`wrist_left` 的变化明显更小，中心变化约 6 px、旋转约 0.58°、scale 约 0.99。`wrist_right` 因有效特征匹配较少，自动配准结果不够可靠，因此只保留画面直接对照，不把异常大的 affine 数字当成相机位姿结论。
+
+这些数字也不应被解释成精确外参标定。它们只回答一个更实际的问题：**当前视觉分布与 standard10 训练时是否仍然可以视为同一套固定场景。** 对只有约 10 条示教、没有外参归一化和强几何增强的当前模型，global 的变化已经不适合简单忽略。
+
+## 七、旧 standard10 保留，新 setup 单独开始
+
+面对新的工作原点和视觉布置，有两个选择：
+
+1. 对旧数据做坐标变换，再处理新旧视觉域差异；
+2. 保留 standard10 作为历史基线，从当前固定 setup 重新采集。
+
+考虑到 standard10 只有 10 条，当前选择第二种。旧数据继续用于：
+
+- 历史 ACT 对照；
+- relative-state 表示实验；
+- 部署策略诊断；
+- 科研记录和复现。
+
+但不直接与新 setup 数据无条件混合训练。
+
+新 setup 暂时仍保持 V1 的窄任务定义：
+
+```text
+固定 W
+固定 A
+固定 B
+固定三路相机
+固定非活动臂位置
+每条开始夹爪 26 mm
+```
+
+## 八、下一步先采 probe，而不是马上扩大到 40 条
+
+下一轮先只采 **3～5 条 probe**。每条仍执行完整 A→B：
+
+```text
+W + 26 mm
+→ 开始录制
+→ 接近 A
+→ 抓取
+→ 抬起
+→ 搬运到 B
+→ 放置
+→ 张开
+→ 上退约 1～2 cm
+→ 稳定 0.3～0.5 s
+→ 保存
+```
+
+回 W 和重新摆零件都放在录制之外。
+
+probe 先检查：
+
+- 每条工作原点是否一致；
+- 首帧是否确实为 W + 26 mm；
+- 三路视频分辨率、帧率和帧数；
+- MP4 与 Parquet 是否逐条对应；
+- lateFrames、cameraDrops；
+- gripper / HAL / Omega stale；
+- timestamp 连续性和 NaN/Inf；
+- action jump；
+- 抓取、放置和退出阶段是否一致；
+- 控制租约、急停和保存流程是否完整。
+
+只有 probe 干净后，再扩大到约 30～40 条，并在训练前固定完整 episode 的 train/validation 划分。
+
+## 九、这阶段能说什么，不能说什么
+
+现在可以说：
+
+- relative-state ACT 在 standard10 的离线 validation 上优于 absolute 表示和 hold 的 full-30 指标；
+- 全窗口分析支持频繁重规划，不支持完整 30 步 open-loop；
+- 7D→14D adapter 和 dry-run 链路已经建立并做过离线/现场无运动验证；
+- 2026-09-23 的新 W 和相机布置已经构成新的实验基准。
+
+还不能说：
+
+- 模型已经能可靠抓取 2～3 mm 零件；
+- offset=5 已经是真机最优控制周期；
+- 13.4 Hz 的 dry-run 环能直接等价于运动中的闭环频率；
+- global 的仿射诊断就是相机精确外参；
+- 新 setup 数据还没有经过 probe 质量审计；
+- validation 已经是独立最终测试集。
+
+下一阶段的重点不是继续堆训练步数，而是先确认**新的坐标基准和视觉基准下，能否稳定得到一小批真正一致的示教数据**。
