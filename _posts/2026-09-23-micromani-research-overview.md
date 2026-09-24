@@ -33,8 +33,7 @@ MicroMani 的记录最初按时间推进：先解决采集稳定性，再整理�
 | 2026-09-22 | [阶段三：从回零绕圈到逐轴机械参考点](/notes/2026/09/22/micromani-homing-reference/) | 机械参考点、寻零、限位参考、返回参考点与现场安全边界 |
 | 2026-09-22 | [阶段四：采集质量、参与设备与控制安全](/notes/2026/09/22/micromani-quality-and-stability/) | participation、夹爪 stale、迟帧、质量报告、控制租约 |
 | 2026-09-23 | [专题复盘：机械寻零完成语义与原点误写](/notes/2026/09/23/micromani-homing-completion-semantics/) | 旧寻零异步完成语义、参考点误写机制、当前修复与 X/Z 剩余问题 |
-| 2026-09-23 | [阶段五：relative ACT、部署审计与新实验基准](/notes/2026/09/23/micromani-relative-act-new-setup/) | relative-state ACT、全窗口 chunk 审计、7D→14D adapter、Live Dry-Run、新工作原点与相机基准 |
-| 2026-09-24 | [现场记录：右臂位置与工作原点重设前快照](/notes/2026/09/24/micromani-right-arm-origin/) | 控制卡零计数与旧软件工作原点坐标区分；新工作原点待设置、待验收 |
+| 2026-09-23 | [阶段五：relative ACT、部署审计与新实验基准](/notes/2026/09/23/micromani-relative-act-new-setup/) | relative-state ACT、全窗口 chunk 审计、7D→14D adapter、Live Dry-Run；9 月 24 日补记右臂工作原点重设前快照 |
 
 第一篇公开标题没有显式“（一）”，后续文章使用了编号。为了避免为统一编号修改已有 URL，这里按内容阶段统一称呼，不再强求所有文章标题形式完全一致。
 
@@ -98,7 +97,7 @@ MicroMani 的记录最初按时间推进：先解决采集稳定性，再整理�
 MicroMani
 ├─ 机械与控制
 │  ├─ 寻零/机械参考语义：已有专题复盘，软件修复已提交，真机重复性仍应独立验收
-│  └─ 2026-09-23 软件工作原点：已重新记录，成为新任务坐标基准
+│  └─ 工作原点：2026-09-23 版本已记录；09-24 右臂重设计划待执行、待验收
 ├─ 数据采集
 │  ├─ 三路相机与编码链：已有阶段性稳定性证据
 │  ├─ participation / stale / lateFrames：新一轮数据仍需持续量化
