@@ -64,7 +64,7 @@ tags: [学习]
 
 ## 修改资料
 
-- `index.html`：首页介绍。
+- `index.html`：首页介绍、精选入口和最近四篇文章；科研索引与总览从专题入口访问，记录页仍展示全部文章。
 - `about.html`：关于我。
 - `_config.yml`：站点标题、简介、网址。
 - `assets/style.css`：统一外观。

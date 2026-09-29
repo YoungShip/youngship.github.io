@@ -5,7 +5,10 @@ layout: default
   <header class="article-header">
     <a class="back-link" href="{{ '/notes/' | relative_url }}">← 所有记录</a>
     <div class="article-kicker"><a class="tag" href="{{ '/notes/' | relative_url }}#{{ page.category | default: '笔记' | uri_escape }}">{{ page.category | default: '笔记' | escape }}</a><span class="meta-divider" aria-hidden="true">/</span><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y年%m月%d日' }}</time><span data-reading-time hidden></span></div>
-    <h1>{{ page.title | escape }}</h1>
+    {% assign title_parts = page.title | split: '：' %}
+    {% assign title_prefix = title_parts | first %}
+    {% assign title_prefix_size = title_prefix | size %}
+    <h1>{% if title_parts.size > 1 and title_prefix_size > 13 %}<span class="article-title-line">{{ title_prefix | escape }}：</span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% else %}{{ page.title | escape }}{% endif %}</h1>
     {% if page.description %}<p class="article-description">{{ page.description | escape }}</p>{% endif %}
     <div class="article-tags">{% for tag in page.tags %}<a href="{{ '/notes/' | relative_url }}?q={{ tag | url_encode }}">#{{ tag | escape }}</a>{% endfor %}</div>
     {% if page.last_modified_at %}<p class="updated-at">更新于 {{ page.last_modified_at | date: '%Y年%m月%d日' }}</p>{% endif %}
