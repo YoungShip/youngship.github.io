@@ -5,18 +5,26 @@ nav: notes
 permalink: /notes/
 description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
 ---
-<header class="page-heading"><p class="eyebrow">THE NOTEBOOK</p><h1>所有记录</h1><p>不必每次都写成文章，值得记下就好。</p></header>
-<aside class="notice" aria-label="MicroMani 科研记录本"><strong>MicroMani 科研记录本</strong><p><a href="/notes/2026/09/23/micromani-research-overview/">科研总览</a> · <a href="/notes/2026/09/29/micromani-research-status/">问题与验收台账</a> · <a href="/notes/2026/09/29/micromani-experiment-register/">实验与数据索引</a></p><p>先看当前状态，再按阶段追溯证据。研究索引与历史文章分别维护。</p></aside>
-{% assign topics = '笔记,踩坑,随想,生活记录' | split: ',' %}
-<nav class="topics" aria-label="文章分类">{% for topic in topics %}<a href="#{{ topic | uri_escape }}">{{ topic }}</a>{% endfor %}</nav>
-{% for topic in topics %}
-<section class="archive-section" id="{{ topic }}" aria-label="{{ topic }}">
-  <h2>{{ topic }}</h2><ul class="post-list">
-  {% assign matches = site.posts | where: 'category', topic %}
-  {% for post in matches %}<li class="post-item"><time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div></li>{% else %}<li class="empty">还没有这类记录，留待以后慢慢写。</li>{% endfor %}
+<header class="page-heading archive-heading"><div><p class="eyebrow">THE NOTEBOOK</p><h1>写下的，留下的<span class="heading-dot">.</span></h1><p>学习、实验与日常。值得记下，就慢慢写。</p></div><span class="archive-total"><strong>{{ site.posts.size }}</strong> 篇记录</span></header>
+<aside class="notebook-banner" aria-label="MicroMani 科研记录本"><div><span class="eyebrow">持续整理的专题</span><h2>MicroMani 科研记录本</h2><p>从当前状态出发，沿着证据回看每一步。</p></div><nav aria-label="科研专题入口"><a href="{{ '/notes/2026/09/23/micromani-research-overview/' | relative_url }}">科研总览 <span aria-hidden="true">↗</span></a><a href="{{ '/notes/2026/09/29/micromani-research-status/' | relative_url }}">问题与验收台账 <span aria-hidden="true">↗</span></a><a href="{{ '/notes/2026/09/29/micromani-experiment-register/' | relative_url }}">实验与数据索引 <span aria-hidden="true">↗</span></a></nav></aside>
+<section class="archive" aria-label="全部文章" data-archive>
+  <div class="archive-tools" data-enhance hidden>
+    <label class="search-field"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">搜索标题、摘要或标签</span><input id="note-search" type="search" placeholder="搜索标题、摘要或标签…" autocomplete="off"><kbd aria-hidden="true">/</kbd></label>
+    <div class="filters" role="group" aria-label="筛选文章">
+      <button type="button" data-filter="all" aria-pressed="true">全部 <span>{{ site.posts.size }}</span></button>
+      {% assign categories = site.posts | map: 'category' | uniq | sort %}
+      {% for category in categories %}{% if category %}{% assign matches = site.posts | where: 'category', category %}<button type="button" data-filter="{{ category | escape }}" aria-pressed="false">{{ category | escape }} <span>{{ matches.size }}</span></button>{% endif %}{% endfor %}
+      <button type="button" data-filter="tag:MicroMani" aria-pressed="false">MicroMani 专题</button>
+    </div>
+  </div>
+  <div class="archive-caption"><span data-result-count aria-live="polite">共 {{ site.posts.size }} 篇记录</span><span>按发表时间 · 由近及远</span></div>
+  <ul class="post-list" id="note-results">
+  {% for post in site.posts %}
+    <li class="post-item" data-note data-category="{{ post.category | default: '笔记' | escape }}" data-tags="{{ post.tags | join: ' ' | escape }}" data-search="{{ post.title | escape }} {{ post.description | escape }} {{ post.tags | join: ' ' | escape }} {{ post.category | escape }}">
+      <div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h2><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h2><p>{{ post.description | escape }}</p>{% if post.tags contains '科研索引' %}<span class="entry-label">科研索引</span>{% endif %}</div><span class="post-arrow" aria-hidden="true">↗</span>
+    </li>
+  {% endfor %}
   </ul>
+  <div class="search-empty" data-empty hidden><span aria-hidden="true">⌕</span><h2>暂时没有找到这条记录</h2><p>换一个关键词，或看看全部文章。</p><button type="button" class="button button-secondary" data-clear>清除搜索与筛选</button></div>
+  <noscript><p class="notice">以下显示全部文章。启用 JavaScript 后可以搜索和筛选记录。</p></noscript>
 </section>
-{% endfor %}
-{% assign known = '笔记,踩坑,随想,生活记录' | split: ',' %}
-{% assign extra_count = 0 %}{% for post in site.posts %}{% unless known contains post.category %}{% assign extra_count = extra_count | plus: 1 %}{% endunless %}{% endfor %}
-{% if extra_count > 0 %}<section class="archive-section" id="其他"><h2>其他记录</h2><ul class="post-list">{% for post in site.posts %}{% unless known contains post.category %}<li class="post-item"><time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><span class="tag">{{ post.category | default: '其他' | escape }}</span><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div></li>{% endunless %}{% endfor %}</ul></section>{% endif %}
