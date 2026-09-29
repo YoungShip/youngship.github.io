@@ -6,6 +6,19 @@ category: 笔记
 tags: [科研记录, MicroMani, 机器人, 数据采集, ACT]
 ---
 
+[科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
+
+> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+
+<details markdown="1">
+<summary>展开本页目录</summary>
+
+* 本页目录
+{:toc}
+
+</details>
+
+
 这段时间主要在推进 MicroMani 的第一条学习流程：先通过遥操作完成微小零件的抓起和放下，把示教保存下来，再用这些数据训练模型，为后续自主抓放做准备。
 
 真正开始做之后，工作很快分成了几条线：采集过程中为什么会断开，保存的视频为什么会卡顿，文件整理完能不能被训练器正确读取，以及模型的 loss 降下来之后，预测动作到底有没有变好。

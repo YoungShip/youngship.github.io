@@ -6,6 +6,19 @@ category: 笔记
 tags: [科研记录, MicroMani, 数据采集, 数据契约, ACT, Omega7]
 ---
 
+[科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
+
+> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+
+<details markdown="1">
+<summary>展开本页目录</summary>
+
+* 本页目录
+{:toc}
+
+</details>
+
+
 ## 这一轮推进到哪里
 
 这篇在 **9 月 29 日整理，记录的是 9 月 26–27 日的工作**。前一篇写到 `xie/44ba381` 的弃用追溯与续录条件检查；后续又完成了两部分：历史数据整理为 **109 条、48,961 帧，87 条训练、22 条验证**，以及隔离候选中的 Omega 开度来源记录和安全续录增强。

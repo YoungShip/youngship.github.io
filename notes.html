@@ -6,6 +6,7 @@ permalink: /notes/
 description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
 ---
 <header class="page-heading"><p class="eyebrow">THE NOTEBOOK</p><h1>所有记录</h1><p>不必每次都写成文章，值得记下就好。</p></header>
+<aside class="notice" aria-label="MicroMani 科研记录本"><strong>MicroMani 科研记录本</strong><p><a href="/notes/2026/09/23/micromani-research-overview/">科研总览</a> · <a href="/notes/2026/09/29/micromani-research-status/">问题与验收台账</a> · <a href="/notes/2026/09/29/micromani-experiment-register/">实验与数据索引</a></p><p>先看当前状态，再按阶段追溯证据。研究索引与历史文章分别维护。</p></aside>
 {% assign topics = '笔记,踩坑,随想,生活记录' | split: ',' %}
 <nav class="topics" aria-label="文章分类">{% for topic in topics %}<a href="#{{ topic | uri_escape }}">{{ topic }}</a>{% endfor %}</nav>
 {% for topic in topics %}

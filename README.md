@@ -90,3 +90,12 @@ Settings → Pages → Deploy from a branch → main → / (root)。使用默认
 网站和源码仓库都公开。不要提交密码、密钥、个人隐私或未公开草稿；`published: false` 只能让网页不展示，不能让公开仓库里的文件变成私密。删除文件后 Git 历史中仍可能保留内容。
 
 参考：[GitHub Pages 写文章](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/adding-content-to-your-github-pages-site-using-jekyll)、[Jekyll 文章格式](https://jekyllrb.com/docs/posts/)。
+
+
+## 科研记录本与新会话交接
+
+MicroMani 按“科研总览 → 问题与验收台账 → 实验与数据索引 → 阶段/专题原文”维护。固定入口在[所有记录](https://youngship.github.io/notes/)。仓库规则和 skill 不保证自动进入所有 ChatGPT 新会话；在项目指令或任务中明确要求先读 `AGENTS.md` 与 `.agents/skills/blog-writing/SKILL.md`，科研模式还需读取其 `references/research-notebook.md`。
+
+收尾请求示例：`按本仓库 AGENTS.md 和 $blog-writing 科研模式，把本会话新增进展同步到科研记录本。先查重，更新相关原文、总览、台账及必要的实验索引，保留失败和待办，完成校验；此次更新并发布，最后报告提交、Pages 构建和页面结果。` 仅写草稿时改为“此次只保存草稿，不提交、不推送”。
+
+结构校验：`python .agents/skills/blog-writing/scripts/check_notebook.py --root .`；脚本测试：`python -m unittest discover -s .agents/skills/blog-writing/scripts -p "test_check_notebook.py"`。使用已验证的 Python 3.8+，不假定 PATH 里的版本。脚本不替代完整 Jekyll 构建、页面检查或实验真实性审查；没有本地 Jekyll 时，在发布授权后核对实际提交的 Pages 构建。

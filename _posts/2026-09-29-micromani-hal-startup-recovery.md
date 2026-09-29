@@ -6,6 +6,19 @@ category: 踩坑
 tags: [科研记录, MicroMani, HAL, DDS, 故障恢复]
 ---
 
+[科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
+
+> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+
+<details markdown="1">
+<summary>展开本页目录</summary>
+
+* 本页目录
+{:toc}
+
+</details>
+
+
 ## 启动失败发生在哪里
 
 9 月 29 日，Windows 异常重启后，MicroMani 启动脚本能够创建 HAL 进程，但本机 `/health` 一直无法连接。第一次失败后切换到 8092 仍然失败；将健康检查改为最多等待 60 秒后，也没有恢复，标准输出和错误日志均为空。
