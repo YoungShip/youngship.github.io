@@ -35,7 +35,7 @@ nav: home
   {% for post in site.posts %}
     {% unless post.tags contains '科研索引' or post.url contains 'micromani-research-overview' %}
       {% if recent_count < 4 %}
-      <li class="post-item"><div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{{ post.description | escape }}</p></div><span class="post-arrow" aria-hidden="true">↗</span></li>
+      <li class="post-item"><div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h3>{% assign tp = post.title | split: '：' %}{% assign tp0 = tp | first %}{% assign tp0_size = tp0 | size %}<a href="{{ post.url | relative_url }}">{% if tp.size > 1 and tp0_size <= 20 %}<span class="title-series">{{ tp0 | escape }}<span class="sr-only">：</span></span>{% for part in tp offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}{% else %}{{ post.title | escape }}{% endif %}</a></h3><p>{{ post.description | escape }}</p></div><span class="post-arrow" aria-hidden="true">↗</span></li>
       {% assign recent_count = recent_count | plus: 1 %}
       {% endif %}
     {% endunless %}

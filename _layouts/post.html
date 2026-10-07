@@ -8,7 +8,7 @@ layout: default
     {% assign title_parts = page.title | split: '：' %}
     {% assign title_prefix = title_parts | first %}
     {% assign title_prefix_size = title_prefix | size %}
-    <h1>{% if title_parts.size > 1 and title_prefix_size > 13 %}<span class="article-title-line">{{ title_prefix | escape }}：</span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% else %}{{ page.title | escape }}{% endif %}</h1>
+    <h1>{% if title_parts.size > 1 and title_prefix_size <= 20 %}<span class="title-series">{{ title_prefix | escape }}<span class="sr-only">：</span></span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% elsif title_parts.size > 1 %}<span class="article-title-line">{{ title_prefix | escape }}：</span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% else %}{{ page.title | escape }}{% endif %}</h1>
     {% if page.description %}<p class="article-description">{{ page.description | escape }}</p>{% endif %}
     <div class="article-tags">{% for tag in page.tags %}<a href="{{ '/notes/' | relative_url }}?q={{ tag | url_encode }}">#{{ tag | escape }}</a>{% endfor %}</div>
     {% if page.last_modified_at %}<p class="updated-at">更新于 {{ page.last_modified_at | date: '%Y年%m月%d日' }}</p>{% endif %}

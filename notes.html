@@ -21,7 +21,7 @@ description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
   <ul class="post-list" id="note-results">
   {% for post in site.posts %}
     <li class="post-item" data-note data-category="{{ post.category | default: '笔记' | escape }}" data-tags="{{ post.tags | join: ' ' | escape }}" data-search="{{ post.title | escape }} {{ post.description | escape }} {{ post.tags | join: ' ' | escape }} {{ post.category | escape }}">
-      <div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h2><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h2><p>{{ post.description | escape }}</p>{% if post.tags contains '科研索引' %}<span class="entry-label">科研索引</span>{% endif %}</div><span class="post-arrow" aria-hidden="true">↗</span>
+      <div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h2>{% assign tp = post.title | split: '：' %}{% assign tp0 = tp | first %}{% assign tp0_size = tp0 | size %}<a href="{{ post.url | relative_url }}">{% if tp.size > 1 and tp0_size <= 20 %}<span class="title-series">{{ tp0 | escape }}<span class="sr-only">：</span></span>{% for part in tp offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}{% else %}{{ post.title | escape }}{% endif %}</a></h2><p>{{ post.description | escape }}</p>{% if post.tags contains '科研索引' %}<span class="entry-label">科研索引</span>{% endif %}</div><span class="post-arrow" aria-hidden="true">↗</span>
     </li>
   {% endfor %}
   </ul>
