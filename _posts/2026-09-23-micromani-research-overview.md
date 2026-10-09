@@ -1,6 +1,8 @@
 ---
 title: "MicroMani 科研记录总览：研究主线、问题状态与阶段索引"
 date: "2026-09-23"
+last_modified_at: "2026-09-29"
+image: /assets/uploads/micromani-global-current-setup-2026-09-23.jpg
 description: "科研记录本入口：当前阶段、问题验收台账、实验数据索引与完整时间线。"
 category: 笔记
 tags: [科研记录, MicroMani, 机器人, 具身智能, 数据采集, ACT, 运动控制]
