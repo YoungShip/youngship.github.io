@@ -1,0 +1,3 @@
+{%- assign entry_no = 0 -%}
+{%- for entry in site.posts -%}{%- if entry.url == include.post.url -%}{%- assign entry_no = site.posts.size | minus: forloop.index0 -%}{%- break -%}{%- endif -%}{%- endfor -%}
+No.{% if entry_no < 10 %}00{% elsif entry_no < 100 %}0{% endif %}{{ entry_no }}

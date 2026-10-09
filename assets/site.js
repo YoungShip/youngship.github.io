@@ -1,11 +1,58 @@
 (() => {
   'use strict';
 
+  const root = document.documentElement;
+  const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  const effectiveTheme = () => root.dataset.theme || (darkScheme.matches ? 'dark' : 'light');
+  function syncTheme() {
+    themeToggle?.setAttribute('aria-pressed', String(effectiveTheme() === 'dark'));
+    const color = getComputedStyle(root).getPropertyValue('--bg').trim();
+    if (color) document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', color));
+  }
+  themeToggle?.addEventListener('click', () => {
+    const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+    // Choosing the system theme again clears the override, so later system changes apply.
+    if (next === (darkScheme.matches ? 'dark' : 'light')) {
+      delete root.dataset.theme;
+      try { localStorage.removeItem('theme'); } catch { /* Storage may be unavailable. */ }
+    } else {
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch { /* Storage may be unavailable. */ }
+    }
+    syncTheme();
+  });
+  darkScheme.addEventListener?.('change', syncTheme);
+  syncTheme();
+
+  const header = document.querySelector('[data-header]');
+  const scrollHandlers = [];
+  let lastY = window.scrollY;
+  let scrollScheduled = false;
+  function onScroll() {
+    scrollScheduled = false;
+    const y = Math.max(0, window.scrollY);
+    if (header) {
+      header.classList.toggle('is-scrolled', y > 8);
+      if (!document.body.classList.contains('toc-open')) {
+        if (y > lastY + 6 && y > 160) header.classList.add('is-hidden');
+        else if (y < lastY - 6 || y <= 160) header.classList.remove('is-hidden');
+      }
+    }
+    if (Math.abs(y - lastY) > 6) lastY = y;
+    scrollHandlers.forEach(handler => handler(y));
+  }
+  window.addEventListener('scroll', () => {
+    if (!scrollScheduled) { scrollScheduled = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  header?.addEventListener('focusin', () => header.classList.remove('is-hidden'));
+
   const archive = document.querySelector('[data-archive]');
   if (archive) {
     const input = archive.querySelector('input[type="search"]');
     const buttons = [...archive.querySelectorAll('[data-filter]')];
     const notes = [...archive.querySelectorAll('[data-note]')];
+    const months = [...archive.querySelectorAll('[data-month]')];
     const count = archive.querySelector('[data-result-count]');
     const empty = archive.querySelector('[data-empty]');
     const normalize = value => value.normalize('NFKC').toLocaleLowerCase().trim();
@@ -21,6 +68,7 @@
         note.hidden = !inCategory || !words.every(word => searchText.get(note).includes(word));
         if (!note.hidden) visible++;
       });
+      months.forEach(month => { month.hidden = !month.querySelector('[data-note]:not([hidden])'); });
       buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
       count.textContent = words.length || filter !== 'all' ? `找到 ${visible} 篇 · 共 ${notes.length} 篇` : `共 ${notes.length} 篇记录`;
       empty.hidden = visible !== 0;
@@ -67,11 +115,16 @@
   }
 
   const article = document.querySelector('[data-article]');
-  if (!article) return;
+  if (!article) { onScroll(); return; }
   const prose = article.querySelector('[data-prose]');
   const headings = [...prose.querySelectorAll('h2, h3')];
   const toc = article.querySelector('[data-toc]');
   const tocList = toc.querySelector('[data-toc-list]');
+  const tocNav = toc.querySelector('nav');
+  const tocOpen = article.querySelector('[data-toc-open]');
+  const tocClose = toc.querySelector('[data-toc-close]');
+  const backdrop = document.querySelector('[data-toc-backdrop]');
+  const sheet = window.matchMedia('(max-width: 980px)');
   if (headings.length >= 3) {
     headings.forEach((heading, index) => {
       if (!heading.id) {
@@ -88,38 +141,67 @@
       tocList.append(item);
     });
     toc.hidden = false;
+    tocOpen.hidden = false;
     const existingToc = prose.querySelector('#markdown-toc');
     if (existingToc?.parentElement.tagName === 'DETAILS') {
       existingToc.parentElement.hidden = true;
     }
-    const details = toc.querySelector('details');
-    const wide = window.matchMedia('(min-width: 981px)');
-    const setDisclosure = () => { details.open = wide.matches; };
-    setDisclosure();
-    wide.addEventListener('change', setDisclosure);
+
+    function openToc() {
+      toc.classList.add('is-open');
+      backdrop.hidden = false;
+      document.body.classList.add('toc-open');
+      tocOpen.setAttribute('aria-expanded', 'true');
+      (tocList.querySelector('[aria-current]') || tocClose).focus({ preventScroll: true });
+    }
+    function closeToc(returnFocus = true) {
+      if (!toc.classList.contains('is-open')) return;
+      toc.classList.remove('is-open');
+      backdrop.hidden = true;
+      document.body.classList.remove('toc-open');
+      tocOpen.setAttribute('aria-expanded', 'false');
+      if (returnFocus) tocOpen.focus({ preventScroll: true });
+    }
+    tocOpen.addEventListener('click', openToc);
+    tocClose.addEventListener('click', () => closeToc());
+    backdrop.addEventListener('click', () => closeToc());
+    tocList.addEventListener('click', event => { if (event.target.closest('a')) closeToc(false); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeToc(); });
+    sheet.addEventListener?.('change', () => closeToc(false));
+
     const links = [...tocList.querySelectorAll('a')];
-    let scheduled = false;
     let active = -1;
-    function markCurrent() {
-      scheduled = false;
+    scrollHandlers.push(() => {
       let next = 0;
-      headings.forEach((heading, index) => { if (heading.getBoundingClientRect().top <= 110) next = index; });
+      headings.forEach((heading, index) => { if (heading.getBoundingClientRect().top <= 120) next = index; });
       if (next === active) return;
       active = next;
       links.forEach((link, index) => {
         if (index === active) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-    }
-    window.addEventListener('scroll', () => {
-      if (!scheduled) { scheduled = true; requestAnimationFrame(markCurrent); }
-    }, { passive: true });
-    markCurrent();
+      const current = links[active];
+      if (!sheet.matches && current && tocNav.scrollHeight > tocNav.clientHeight) {
+        const top = current.offsetTop - tocNav.offsetTop;
+        if (top < tocNav.scrollTop || top > tocNav.scrollTop + tocNav.clientHeight - 48) tocNav.scrollTop = top - tocNav.clientHeight / 3;
+      }
+    });
   }
 
+  const progress = document.querySelector('[data-progress]');
+  const tools = article.querySelector('[data-reading-tools]');
+  scrollHandlers.push(y => {
+    const rect = prose.getBoundingClientRect();
+    const total = rect.height - window.innerHeight * 0.6;
+    const ratio = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+    if (progress) progress.style.transform = `scaleX(${ratio})`;
+    tools?.classList.toggle('is-visible', y > window.innerHeight * 0.9);
+  });
+  onScroll();
+
   const text = prose.textContent;
-  const chinese = (text.match(/[\u3400-\u9fff]/g) || []).length;
-  const words = (text.replace(/[\u3400-\u9fff]/g, ' ').match(/[A-Za-z0-9]+/g) || []).length;
+  const chinese = (text.match(/[㐀-鿿]/g) || []).length;
+  const words = (text.replace(/[㐀-鿿]/g, ' ').match(/[A-Za-z0-9]+/g) || []).length;
   const readingTime = article.querySelector('[data-reading-time]');
   readingTime.textContent = `约 ${Math.max(1, Math.ceil(chinese / 350 + words / 220))} 分钟阅读`;
   readingTime.hidden = false;
