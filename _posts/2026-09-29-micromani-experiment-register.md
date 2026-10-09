@@ -28,7 +28,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | D03：strict23 | 14 train / 9 validation；本索引不补猜总帧数 | 与 usable53 的验证集合不同，不能直接按模型误差判断数据筛选优劣。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D04：usable53 | 38 train / 15 validation；21,480 个训练窗、6,937 个验证窗；severe mask 后保留 21,145 个训练窗 | mask 只作用训练，验证不筛；归一化文件核对一致。81 个标记帧影响 335 个重叠窗口，不等于 335 个坏帧。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D05：历史 109 条 / 48,961 帧 | 87 train / 22 validation；训练窗 36,566→36,496，验证保留全部 9,234 窗 | 固定种子 20260927；五个副本未物理合并。按最终 JSON 清单读取，不能直接扫描目录；尚未启动基于此最终清单的新训练。[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/) |
-| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance) |
+| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 
 D05 最终入口为 `combined-train-validation-split-20260927.json`。yxp v1 副本仍保留本轮排除项；取数需结合元数据与原生映射。归一化只用对应 87 条训练数据。**文件完整、任务成功、符合采集规范和选入某轮训练，是不同判定。**
 
