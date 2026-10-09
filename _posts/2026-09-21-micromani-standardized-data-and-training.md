@@ -86,7 +86,7 @@ tags: [科研记录, MicroMani, 机器人, 数据采集, ACT, 模仿学习]
 
 *腕部相机（界面标注 Left Wrist Camera）：工作原点处的夹爪与工装板。*
 
-![更新后的右腕相机工作原点视图](/assets/uploads/micromani-work-origin-wrist-right-2026-09-22.png)
+![更新后的右腕相机工作原点视图](/assets/uploads/micromani-work-origin-wrist-right-2026-09-22.jpg)
 
 *更新后的右腕相机（界面标注 Right Wrist Camera）：右臂工作原点下的夹爪与工装板。*
 

@@ -37,6 +37,15 @@ collections:
         date_format: YYYY-MM-DD
         time_format: false
         hint: 使用今天或过去的日期。未来日期不会立即显示在博客上。
+      - label: 更新日期
+        name: last_modified_at
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        required: false
+        hint: 可选。内容有实质更新时填写，文章页会显示“更新于”。
+      - {label: 分享配图, name: image, widget: image, required: false, hint: 可选。链接分享到社交平台时显示的配图。}
       - {label: 一句话摘要, name: description, widget: text, hint: 显示在首页和记录列表中。}
       - label: 分类
         name: category

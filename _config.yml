@@ -9,6 +9,7 @@ markdown: kramdown
 permalink: /notes/:year/:month/:day/:title/
 plugins:
   - jekyll-sitemap
+  - jekyll-feed
 kramdown:
   input: GFM
 defaults:

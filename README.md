@@ -40,8 +40,6 @@ tags: [学习]
 
 建议分类：笔记、踩坑、随想、生活记录。记录页按时间展示全部文章，筛选按钮从已有文章的分类自动生成，没有文章的分类暂不显示。
 
-附带的「从这里开始，写下第一篇记录」是明确标注的示例/写作说明，可以编辑或删除。
-
 ## 在另一台电脑用 Codex 写作
 
 仓库自带 `AGENTS.md` 协作规则和 `.agents/skills/blog-writing/` 写作技能，不依赖原电脑的文件路径。
@@ -72,7 +70,7 @@ tags: [学习]
 
 搜索与筛选支持通过网址分享；旧的 `/notes/#分类` 链接仍可使用。长文目录沿用 Jekyll 已生成的标题 ID，不改写已有锚点；禁用 JavaScript 时仍可阅读全部文章，正文原有目录保留。桌面目录固定在正文右侧，小屏幕收为可展开目录。编号型宽表格滚动时保留首列，代码复制仅在浏览器支持的安全上下文中提供。
 
-文章可选填 `last_modified_at: YYYY-MM-DD` 展示真实更新日期；没有填写时只显示发表日期，不用构建时间冒充更新时间。以后更新阅读页的 CSS/JS 时，同步调整 `_layouts/default.html` 中对应资源的 `v` 参数，以便浏览器获取新版。
+文章可选填 `last_modified_at: YYYY-MM-DD` 展示真实更新日期；没有填写时只显示发表日期，不用构建时间冒充更新时间。文章还可选填 `image: /assets/uploads/...` 作为社交平台分享卡片的配图；页面统一输出 Open Graph 标签，未填写时只显示标题和摘要。以后更新阅读页的 CSS/JS 时，同步调整 `_layouts/default.html` 中对应资源的 `v` 参数，以便浏览器获取新版。
 
 当前昵称使用 GitHub 用户名 YoungShip，没有编造真实姓名、工作经历或联系方式。
 
@@ -83,6 +81,8 @@ Settings → Pages → Deploy from a branch → main → / (root)。使用默认
 本地如需完整预览，可安装 Ruby/Jekyll 后使用 GitHub Pages 支持的版本构建；日常写文章不需要本地构建。
 
 ## 搜索引擎发现
+
+`jekyll-feed` 自动生成 RSS/Atom 订阅地址 `/feed.xml`，页面头部已声明订阅链接。
 
 `jekyll-sitemap` 在每次 GitHub Pages 构建时自动生成 `/sitemap.xml`，`/robots.txt` 声明网站地图地址。公开文章可以被抓取；后台、写作帮助和 404 页不进入网站地图，后台与帮助/404 页面通过 `noindex` 提示搜索引擎不要收录。不要通过 robots.txt 禁止这些 HTML 页的抓取，否则爬虫可能看不到页面上的 `noindex`。
 
