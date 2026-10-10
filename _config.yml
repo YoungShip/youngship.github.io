@@ -4,6 +4,7 @@ url: https://youngship.github.io
 baseurl: ""
 lang: zh-CN
 google_site_verification: "p0jpdMO47WUZjXzqTtBwzn9TT37Zml2-T7NXW7SRFmE"
+og_image: /assets/icons/og-default.png
 timezone: Asia/Shanghai
 markdown: kramdown
 permalink: /notes/:year/:month/:day/:title/

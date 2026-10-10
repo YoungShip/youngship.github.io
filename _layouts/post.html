@@ -7,27 +7,35 @@ layout: default
 {%- capture entry_label -%}{% include entry-no.html post=page %}{%- endcapture -%}
 <div class="reading-progress" data-progress aria-hidden="true"></div>
 <article class="article" data-article>
-  <header class="article-header">
-    <nav class="breadcrumb" aria-label="当前位置"><a href="{{ '/notes/' | relative_url }}">所有记录</a>{% if is_research %}<span aria-hidden="true">/</span><a href="{{ site.research.overview | relative_url }}">MicroMani 科研记录本</a>{% endif %}</nav>
-    <div class="article-meta"><span class="entry-no">{{ entry_label }}</span><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y年%m月%d日' }}</time><span data-reading-time hidden></span><a class="tag" data-cat="{{ category | escape }}" href="{{ '/notes/' | relative_url }}?category={{ category | url_encode }}">{{ category | escape }}</a></div>
-    {% assign title_parts = page.title | split: '：' %}
-    {% assign title_prefix = title_parts | first %}
-    {% assign title_prefix_size = title_prefix | size %}
-    <h1>{% if title_parts.size > 1 and title_prefix_size <= 20 %}<span class="title-series">{{ title_prefix | escape }}<span class="sr-only">：</span></span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% elsif title_parts.size > 1 %}<span class="article-title-line">{{ title_prefix | escape }}：</span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% else %}{{ page.title | escape }}{% endif %}</h1>
-    {% if page.description %}<p class="article-description">{{ page.description | escape }}</p>{% endif %}
-    {% if page.tags.size > 0 or page.last_modified_at %}<div class="article-foot">{% if page.tags.size > 0 %}<div class="article-tags">{% for tag in page.tags %}<a href="{{ '/notes/' | relative_url }}?q={{ tag | url_encode }}">#{{ tag | escape }}</a>{% endfor %}</div>{% endif %}{% if page.last_modified_at %}<p class="updated-at">更新于 {{ page.last_modified_at | date: '%Y年%m月%d日' }}</p>{% endif %}</div>{% endif %}
-  </header>
   <div class="article-grid">
+    <nav class="breadcrumb" aria-label="当前位置"><a href="{{ '/notes/' | relative_url }}">所有记录</a>{% if is_research %}<span aria-hidden="true">/</span><a href="{{ site.research.overview | relative_url }}">MicroMani 科研记录本</a>{% endif %}</nav>
+    <aside class="article-margin" aria-label="记录信息">
+      <dl class="entry-facts">
+        <div class="fact-no"><dt>编号</dt><dd class="entry-no">{{ entry_label }}</dd></div>
+        <div><dt>发表于</dt><dd><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y.%m.%d' }}</time></dd></div>
+        <div><dt>分类</dt><dd><a class="tag" data-cat="{{ category | escape }}" href="{{ '/notes/' | relative_url }}?category={{ category | url_encode }}">{{ category | escape }}</a></dd></div>
+        <div data-reading-row hidden><dt>阅读时间</dt><dd data-reading-time></dd></div>
+        {% if page.last_modified_at %}<div class="fact-updated"><dt>更新于</dt><dd><span class="fact-label" aria-hidden="true">更新于 </span><time datetime="{{ page.last_modified_at | date: '%Y-%m-%d' }}">{{ page.last_modified_at | date: '%Y.%m.%d' }}</time></dd></div>{% endif %}
+      </dl>
+    </aside>
+    <header class="article-header">
+      {%- assign title_parts = page.title | split: '：' -%}
+      {%- assign title_prefix = title_parts | first -%}
+      {%- assign title_prefix_size = title_prefix | size %}
+      <h1>{% if title_parts.size > 1 and title_prefix_size <= 20 %}<span class="title-series">{{ title_prefix | escape }}<span class="sr-only">：</span></span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% elsif title_parts.size > 1 %}<span class="article-title-line">{{ title_prefix | escape }}：</span><span class="article-title-line">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>{% else %}{{ page.title | escape }}{% endif %}</h1>
+      {% if page.description %}<p class="article-description">{{ page.description | escape }}</p>{% endif %}
+      {% if page.tags.size > 0 %}<div class="article-tags" aria-label="标签">{% for tag in page.tags %}<a href="{{ '/notes/' | relative_url }}?q={{ tag | url_encode }}">#{{ tag | escape }}</a>{% endfor %}</div>{% endif %}
+    </header>
     <div class="article-content">
       <div class="prose" data-prose>{{ content }}</div>
-      <footer class="article-end"><span class="end-mark">END OF ENTRY · {{ entry_label }}</span><p>写下来，留给下一次理解。</p></footer>
-      {% if is_research %}<aside class="related-note" aria-label="MicroMani 科研记录本"><div><span class="eyebrow">沿着这条线索</span><h2>回到 MicroMani 科研记录本</h2><p>当前状态、验收条件与阶段记录，都从这里连接。</p></div><nav aria-label="科研记录本入口"><a href="{{ site.research.overview | relative_url }}">科研总览 <span aria-hidden="true">→</span></a><a href="{{ site.research.status | relative_url }}">问题与验收台账 <span aria-hidden="true">→</span></a><a href="{{ site.research.register | relative_url }}">实验与数据索引 <span aria-hidden="true">→</span></a></nav></aside>{% endif %}
-      {% if page.previous or page.next %}<nav class="pager" aria-label="相邻记录">{% if page.previous %}<a class="pager-prev" href="{{ page.previous.url | relative_url }}" rel="prev"><span>← 较早一篇</span><strong>{{ page.previous.title | escape }}</strong></a>{% endif %}{% if page.next %}<a class="pager-next" href="{{ page.next.url | relative_url }}" rel="next"><span>较新一篇 →</span><strong>{{ page.next.title | escape }}</strong></a>{% endif %}</nav>{% endif %}
+      <footer class="article-end"><span class="end-mark">{{ entry_label }}</span><p>写下来，留给下一次理解。</p></footer>
+      {% if is_research %}<aside class="related-note" aria-label="MicroMani 科研记录本"><div><h2>回到 MicroMani 科研记录本</h2><p>当前状态、验收条件与阶段记录，都从这里连接。</p></div><nav aria-label="科研记录本入口"><a href="{{ site.research.overview | relative_url }}">科研总览</a><a href="{{ site.research.status | relative_url }}">问题与验收台账</a><a href="{{ site.research.register | relative_url }}">实验与数据索引</a></nav></aside>{% endif %}
+      {% if page.previous or page.next %}<nav class="pager" aria-label="相邻记录">{% if page.previous %}<a class="pager-prev" href="{{ page.previous.url | relative_url }}" rel="prev"><span>较早一篇</span><strong>{{ page.previous.title | escape }}</strong></a>{% endif %}{% if page.next %}<a class="pager-next" href="{{ page.next.url | relative_url }}" rel="next"><span>较新一篇</span><strong>{{ page.next.title | escape }}</strong></a>{% endif %}</nav>{% endif %}
     </div>
     <aside class="toc" id="toc" data-toc hidden>
-      <div class="toc-head"><span class="toc-title">本篇目录</span><button type="button" class="toc-close" data-toc-close>关闭</button></div>
+      <div class="toc-head"><span class="toc-title">目录</span><button type="button" class="toc-close" data-toc-close>关闭</button></div>
       <nav aria-label="本篇目录"><ol data-toc-list></ol></nav>
-      <a class="toc-top" href="#top">回到顶部 <span aria-hidden="true">↑</span></a>
+      <a class="toc-top" href="#top">回到顶部</a>
     </aside>
   </div>
   <div class="reading-tools" data-reading-tools><button type="button" class="tool-btn" data-toc-open aria-controls="toc" aria-expanded="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg>目录</button><a class="tool-btn tool-top" href="#top" aria-label="回到顶部"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></a></div>
