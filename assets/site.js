@@ -146,13 +146,28 @@
       heading.id = id;
     }
   });
+  // Short enumerators (一、 A. 3. M01：) hang in their own column so a wrapped
+  // item still reads as one block.
+  const ENUM = /^((?:[一二三四五六七八九十]{1,3}、|[A-Z][.．]\s*|\d{1,2}[.．、]\s*|[A-Z]\d{2}[：:]\s*))(.+)$/u;
   if (headings.length >= 3) {
     headings.forEach(heading => {
       const item = document.createElement('li');
       if (heading.tagName === 'H3') item.className = 'toc-sub';
       const link = document.createElement('a');
       link.href = `#${encodeURIComponent(heading.id)}`;
-      link.textContent = heading.textContent;
+      const label = heading.textContent.trim();
+      const parts = label.match(ENUM);
+      if (parts) {
+        link.className = 'has-num';
+        const num = document.createElement('span');
+        num.className = 'toc-num';
+        num.textContent = parts[1].trim().replace(/[：:]$/, '：');
+        const rest = document.createElement('span');
+        rest.textContent = parts[2];
+        link.append(num, rest);
+      } else {
+        link.textContent = label;
+      }
       item.append(link);
       tocList.append(item);
     });

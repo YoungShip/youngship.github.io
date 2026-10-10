@@ -5,7 +5,7 @@ nav: notes
 permalink: /notes/
 description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
 ---
-<header class="page-heading archive-heading"><h1>所有记录</h1><p>学习、实验与日常。值得记下，就慢慢写。</p></header>
+<header class="page-heading archive-heading"><div><h1>所有记录</h1><p>学习、实验与日常。值得记下，就慢慢写。</p></div><p class="page-count"><strong>{{ site.posts.size }}</strong><span>篇记录</span></p></header>
 <aside class="notebook-banner" aria-label="MicroMani 科研记录本"><h2>MicroMani 科研记录本</h2><nav aria-label="科研专题入口"><a href="{{ site.research.overview | relative_url }}">科研总览</a><a href="{{ site.research.status | relative_url }}">问题与验收台账</a><a href="{{ site.research.register | relative_url }}">实验与数据索引</a></nav></aside>
 <section class="archive" aria-label="全部文章" data-archive>
   <div class="archive-tools" data-enhance hidden>
@@ -23,7 +23,7 @@ description: 笔记、踩坑、随想和生活记录，按时间慢慢积累。
   {% for month in months %}
     {% assign month_date = month.items.first.date %}
     <section class="month" data-month aria-labelledby="month-{{ month.name }}">
-      <h2 class="month-label" id="month-{{ month.name }}"><span class="month-year">{{ month_date | date: '%Y' }} 年</span><span class="month-num">{{ month_date | date: '%-m' }} 月</span><span class="month-count">{{ month.size }} 篇</span></h2>
+      <h2 class="month-label" id="month-{{ month.name }}"><span class="month-year">{{ month_date | date: '%Y' }} 年</span><span class="month-num">{{ month_date | date: '%m' }}<span class="month-unit">月</span></span><span class="month-count">{{ month.size }} 篇</span></h2>
       <ol class="entry-list">
       {% for post in month.items %}{% include entry.html post=post level=3 %}{% endfor %}
       </ol>
