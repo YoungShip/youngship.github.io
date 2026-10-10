@@ -209,3 +209,7 @@ backend 在开始前撤销所选轴的旧确认；收到 `homeCompleted=true` �
 这也是这次问题最值得保留的部分：真正需要修的不是某一个 pulse 数字，而是“完成”这个词在 HAL、backend 和界面之间必须有一致、可验证的语义。
 
 相关现场时间线见：[从回零绕圈到逐轴机械参考点](/notes/2026/09/22/micromani-homing-reference/)；整个项目的研究主线和当前状态见：[MicroMani 科研记录总览](/notes/2026/09/23/micromani-research-overview/)。
+
+## 后记（2026-10-10）
+
+10 月 8 日回工作原点时出现 Roll 约 −1732° 的危险多圈规划。那次调用的是返回已保存 W 的 `home_origin_side`，不是本文讨论的机械寻零搜索，属于另一条路径；单独记录在[回工作原点时的危险多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)，台账 [A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)。
