@@ -7,6 +7,10 @@ google_site_verification: "p0jpdMO47WUZjXzqTtBwzn9TT37Zml2-T7NXW7SRFmE"
 timezone: Asia/Shanghai
 markdown: kramdown
 permalink: /notes/:year/:month/:day/:title/
+research:
+  overview: /notes/2026/09/23/micromani-research-overview/
+  status: /notes/2026/09/29/micromani-research-status/
+  register: /notes/2026/09/29/micromani-experiment-register/
 plugins:
   - jekyll-sitemap
   - jekyll-feed

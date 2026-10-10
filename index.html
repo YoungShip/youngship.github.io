@@ -2,45 +2,77 @@
 layout: default
 nav: home
 ---
+{%- assign first_post = site.posts | last -%}
+{%- assign latest_post = site.posts | first -%}
+{%- assign research_count = 0 -%}
+{%- for post in site.posts -%}{%- if post.tags contains 'MicroMani' -%}{%- assign research_count = research_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
 <section class="hero" aria-labelledby="hello">
-  <div class="hero-identity">
-    <p class="eyebrow">PERSONAL NOTEBOOK <span aria-hidden="true">/</span> EST. 2026</p>
-    <h1 id="hello">YoungShip<span>.</span></h1>
-    <p class="hero-caption">学习 · 实践 · 生活</p>
+  <div class="hero-main">
+    <p class="eyebrow">Personal lab notebook <span aria-hidden="true">·</span> Est. 2026</p>
+    <h1 id="hello" class="wordmark">YoungShip<span>.</span></h1>
+    <p class="hero-lead">你好，很高兴你来。</p>
+    <p class="hero-intro">记录学习与实践，也留下生活里的想法。</p>
+    <div class="hero-actions"><a class="button" href="{{ site.research.overview | relative_url }}">翻开科研记录本 <span aria-hidden="true">→</span></a><a class="button button-ghost" href="{{ '/notes/' | relative_url }}">全部记录 <span class="button-count">{{ site.posts.size }}</span></a></div>
   </div>
-  <div class="hero-copy">
-    <p class="hero-greeting">你好，很高兴你来。</p>
-    <p class="intro">记录学习与实践，<br>也留下生活里的想法。</p>
-    <div class="hero-links"><a href="{{ '/about/' | relative_url }}">关于我 <span aria-hidden="true">↗</span></a><a href="{{ '/notes/' | relative_url }}">全部记录 <span class="count">{{ site.posts.size }}</span> <span aria-hidden="true">→</span></a></div>
+  <aside class="notebook-label" aria-label="记录本概况">
+    <p class="label-title"><span>NOTEBOOK</span><span>学习 · 实践 · 生活</span></p>
+    <dl>
+      <div><dt>记录者</dt><dd>YoungShip</dd></div>
+      <div><dt>篇数</dt><dd>{% if site.posts.size < 10 %}00{% elsif site.posts.size < 100 %}0{% endif %}{{ site.posts.size }}</dd></div>
+      {% if first_post %}<div><dt>起始</dt><dd>{{ first_post.date | date: '%Y.%m.%d' }}</dd></div>{% endif %}
+      {% if latest_post %}<div><dt>最近</dt><dd><a href="{{ latest_post.url | relative_url }}">{{ latest_post.date | date: '%Y.%m.%d' }}</a></dd></div>{% endif %}
+      <div><dt>主线</dt><dd><a href="{{ site.research.overview | relative_url }}">MicroMani 科研</a></dd></div>
+    </dl>
+  </aside>
+</section>
+
+<section class="home-section" aria-labelledby="research-title">
+  <header class="section-head"><span class="section-index" aria-hidden="true">01</span><h2 id="research-title">科研记录本</h2><p class="section-desc">MicroMani：机器人实验的过程，问题与证据的索引。</p><a class="section-link" href="{{ '/notes/' | relative_url }}?category=tag%3AMicroMani">全部 {{ research_count }} 篇 <span aria-hidden="true">→</span></a></header>
+  <div class="research-grid">
+    <div class="research-card">
+      <a class="research-cover" href="{{ site.research.overview | relative_url }}">
+        <figure><img src="{{ '/assets/uploads/micromani-global-current-setup-2026-09-23.jpg' | relative_url }}" alt="MicroMani 双臂实验装置与工作台" width="640" height="480"><figcaption>实验现场 / 2026.09</figcaption></figure>
+        <div class="research-cover-body"><span class="eyebrow">专题 / Research</span><h3>MicroMani 科研记录本</h3><p>从遥操作示教、可追溯数据到 ACT 训练与部署审计，按阶段记下过程、问题和证据。</p></div>
+      </a>
+      <nav class="research-index" aria-label="科研记录本入口">
+        <a href="{{ site.research.overview | relative_url }}"><strong>科研总览</strong><small>当前阶段与完整时间线</small><span aria-hidden="true">→</span></a>
+        <a href="{{ site.research.status | relative_url }}"><strong>问题与验收台账</strong><small>问题状态、证据与验收条件</small><span aria-hidden="true">→</span></a>
+        <a href="{{ site.research.register | relative_url }}"><strong>实验与数据索引</strong><small>数据、模型与比较边界</small><span aria-hidden="true">→</span></a>
+      </nav>
+    </div>
+    <div class="research-latest">
+      <h3 class="list-title">最近的科研记录</h3>
+      <ol class="entry-list">
+      {%- assign shown = 0 -%}
+      {%- for post in site.posts -%}
+        {%- if post.tags contains 'MicroMani' -%}{%- unless post.tags contains '科研索引' or post.url == site.research.overview -%}{%- if shown < 4 -%}
+        {% include entry.html post=post level=4 %}
+        {%- assign shown = shown | plus: 1 -%}
+        {%- endif -%}{%- endunless -%}{%- endif -%}
+      {%- endfor -%}
+      </ol>
+    </div>
   </div>
 </section>
 
-<section class="featured-section" aria-labelledby="featured">
-  <div class="section-heading"><h2 id="featured"><span class="section-number" aria-hidden="true">01</span> 值得先读</h2><span class="section-note">从一个专题，或一次排查开始</span></div>
-  <div class="featured-grid">
-    <a class="feature-card feature-research" href="{{ '/notes/2026/09/23/micromani-research-overview/' | relative_url }}">
-      <div class="feature-copy"><span class="eyebrow">专题 / RESEARCH</span><h3>MicroMani<br>科研记录本</h3><p>机器人实验的过程，<br>问题与证据的索引。</p><span class="feature-cta">翻开专题 <span aria-hidden="true">↗</span></span></div>
-      <figure class="feature-image"><img src="{{ '/assets/uploads/micromani-global-current-setup-2026-09-23.jpg' | relative_url }}" alt="MicroMani 双臂实验装置与工作台" width="640" height="480" fetchpriority="high"><figcaption>实验现场 / 2026.09</figcaption></figure>
-    </a>
-    <a class="feature-card feature-essay" href="{{ '/notes/2026/09/20/codex-browser-proxy/' | relative_url }}">
-      <div class="essay-top"><span class="eyebrow">选读 / TOOL NOTES</span><span class="essay-mark" aria-hidden="true">&gt;_</span></div><h3>Codex 浏览器的<br>一次代理排查</h3><p>沿着启动链路，找到丢失的代理变量。</p><span class="feature-cta">阅读踩坑记录 <span aria-hidden="true">↗</span></span>
-    </a>
+<section class="home-section" aria-labelledby="other-title">
+  <header class="section-head"><span class="section-index" aria-hidden="true">02</span><h2 id="other-title">工具、踩坑与随手记</h2><p class="section-desc">一个工具为什么失灵，一段知识如何理解，或者一个不想忘记的念头。</p><a class="section-link" href="{{ '/notes/' | relative_url }}">所有记录 <span aria-hidden="true">→</span></a></header>
+  <div class="card-grid">
+  {%- assign shown = 0 -%}
+  {%- for post in site.posts -%}
+    {%- unless post.tags contains 'MicroMani' -%}{%- if shown < 3 -%}
+    {%- assign card_category = post.category | default: '笔记' -%}
+    <article class="note-card">
+      <div class="note-card-meta"><span class="tag" data-cat="{{ card_category | escape }}">{{ card_category | escape }}</span><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time></div>
+      <h3><a href="{{ post.url | relative_url }}">{% include post-title.html post=post %}</a></h3>
+      <p>{{ post.description | escape }}</p>
+      <div class="note-card-foot"><span>{% include entry-no.html post=post %}</span><span aria-hidden="true">→</span></div>
+    </article>
+    {%- assign shown = shown | plus: 1 -%}
+    {%- endif -%}{%- endunless -%}
+  {%- endfor -%}
+  {%- if shown == 0 -%}<p class="empty">还没有科研以外的记录。下一段记录，慢慢写。</p>{%- endif -%}
   </div>
 </section>
 
-<section class="recent-section" aria-labelledby="recent">
-  <div class="section-heading"><h2 id="recent"><span class="section-number" aria-hidden="true">02</span> 最近写下的</h2><a class="text-link" href="{{ '/notes/' | relative_url }}">去笔记库 →</a></div>
-  <ul class="post-list">
-  {% assign recent_count = 0 %}
-  {% for post in site.posts %}
-    {% unless post.tags contains '科研索引' or post.url contains 'micromani-research-overview' %}
-      {% if recent_count < 4 %}
-      <li class="post-item"><div class="post-meta"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%Y.%m.%d' }}</time><span class="tag">{{ post.category | default: '笔记' | escape }}</span></div><div class="post-summary"><h3>{% assign tp = post.title | split: '：' %}{% assign tp0 = tp | first %}{% assign tp0_size = tp0 | size %}<a href="{{ post.url | relative_url }}">{% if tp.size > 1 and tp0_size <= 20 %}<span class="title-series">{{ tp0 | escape }}<span class="sr-only">：</span></span>{% for part in tp offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}{% else %}{{ post.title | escape }}{% endif %}</a></h3><p>{{ post.description | escape }}</p></div><span class="post-arrow" aria-hidden="true">↗</span></li>
-      {% assign recent_count = recent_count | plus: 1 %}
-      {% endif %}
-    {% endunless %}
-  {% endfor %}
-  {% if recent_count == 0 %}<li class="empty">还没有公开的文章。下一段记录，慢慢写。</li>{% endif %}
-  </ul>
-  <a class="archive-link" href="{{ '/notes/' | relative_url }}">翻阅全部 {{ site.posts.size }} 篇记录 <span aria-hidden="true">→</span></a>
-</section>
+<a class="archive-band" href="{{ '/notes/' | relative_url }}"><span>翻阅全部 <strong>{{ site.posts.size }}</strong> 篇记录</span><span class="archive-band-arrow" aria-hidden="true">→</span></a>

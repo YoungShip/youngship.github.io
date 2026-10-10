@@ -1,0 +1,8 @@
+{%- assign title_parts = include.post.title | split: '：' -%}
+{%- assign title_prefix = title_parts | first -%}
+{%- assign title_prefix_size = title_prefix | size -%}
+{%- if title_parts.size > 1 and title_prefix_size <= 20 -%}
+<span class="title-series">{{ title_prefix | escape }}<span class="sr-only">：</span></span><span class="title-main">{% for part in title_parts offset: 1 %}{% unless forloop.first %}：{% endunless %}{{ part | escape }}{% endfor %}</span>
+{%- else -%}
+<span class="title-main">{{ include.post.title | escape }}</span>
+{%- endif -%}
