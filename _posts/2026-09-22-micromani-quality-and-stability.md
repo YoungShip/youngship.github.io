@@ -8,22 +8,19 @@ tags: [科研记录, MicroMani, 机器人, 数据采集, 控制安全, ACT]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+> **事件日期：**2026-09-21～22　**整理：**09-22　**关联台账：**[B07](/notes/2026/09/29/micromani-research-status/#B07)、[B08](/notes/2026/09/29/micromani-research-status/#B08)、[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C11](/notes/2026/09/29/micromani-research-status/#C11)
 
-<details markdown="1">
-<summary>展开本页目录</summary>
+**本阶段结论：**补采时的告警其实混着三类不同的问题：数据质量（反馈迟到、迟帧）、设备健康（反馈无效）和控制安全（控制权该不该撤销）。夹爪 stale 多数是“读到了但晚到”，不是硬件坏了；质量检查应由显式的参与侧决定，而不是靠运动幅度去猜；backend 代为续租降低了误断控，却带来“浏览器已冻结但连接还在”的新风险，需要独立的浏览器心跳。几项都还没有真机验收。
 
-* 本页目录
-{:toc}
+## 要回答的问题
 
-</details>
+[前三篇](/notes/2026/09/21/micromani-standardized-data-and-training/)处理了采集、规范示教和寻零。继续补采后，新的问题是：
 
+1. 一条示教的质量检查，应该检查哪些设备？
+2. 反馈迟到，是否等于设备失效？
+3. 浏览器失活后，控制权应该怎样撤销？
 
-前三篇记录分别处理了早期采集与 ACT 诊断、规范示教与 standard10，以及机械参考点和寻零。继续补采以后，新的问题不再是“相机能不能录下来”这么单一，而是三个相互关联的层面：**参与设备到底应该检查什么、反馈迟到是否等同于设备失效、浏览器失活以后控制权应该怎样撤销。**
-
-这一阶段最容易犯的错误，是把所有 warning 都当成同一种失败。质量报告、控制租约和硬件状态必须拆开，否则既可能误删仍可复核的数据，也可能把真正的安全故障当成普通时序波动。
-
-> **后续状态：**本文记录 9 月 22 日的问题与判断。夹爪采样时间、录制启动和组帧配置复用的后续修改见[9 月 26 日记录](/notes/2026/09/26/micromani-collection-and-act-pause/)；Omega 来源与安全续录增强的隔离候选见[9 月 29 日记录](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)。当前已实现、待部署和待现场验收的范围统一见[科研总览](/notes/2026/09/23/micromani-research-overview/)，不把本页历史“待修改”当成最新实现状态。
+这一阶段最容易犯的错误，是把所有 warning 都当成同一种失败：既可能误删仍可复核的数据，也可能把真正的安全故障当成普通时序波动。
 
 ## 一、质量报告首先要知道“这一条示教用了谁”
 
@@ -105,15 +102,7 @@ hardware emergency stop requested
 
 ## 五、离线检查说明了什么
 
-针对 9 月 21 日之后涉及回放、participation、DDS 隔离等改动，相关的 11 个 backend 测试文件单独重跑为 **425 passed / 0 failed**；HAL 的 MotionExecutor、EmergencyStop、ControlLease、ThreadStability、WorkerResilience、ForceTareRuntime 和 ForceCore 等离线测试也通过。
-
-但完整前端质量门并没有全绿：
-
-- TypeScript typecheck 通过；
-- 前端测试为 **430 passed / 4 failed**；
-- lint 仍有 **15 errors**，其中有一部分可以追溯到这批新增的回放和三路预览代码。
-
-这些结果意味着专项代码路径有较好的回归覆盖，但**不能写成整个系统已验收完成**。前端测试夹具、lint 回归和浏览器 liveness 仍然需要收尾。
+回放、participation、DDS 隔离等改动的后端专项测试和 HAL 离线测试都通过了，但前端完整质量门没有全绿：仍有 4 项测试失败和 15 个 lint 错误，其中一部分来自这批新增的回放和三路预览代码（明细见附录）。也就是说，专项路径有回归覆盖，但**整个系统还谈不上验收**，前端回归和浏览器心跳都要收尾。
 
 ## 六、这阶段真正留下的规则
 
@@ -127,3 +116,14 @@ hardware emergency stop requested
 因此最近的诊断 episode 不直接并入正式训练集。恢复批量采集之前，至少应先完成浏览器 liveness 安全语义、前端回归清理，以及 participation 驱动的质量规则，再用短样本做一次完整真机验收。
 
 这篇记录的重点不是给每条 warning 设一个绝对分数，而是把“数据质量”“设备健康”“控制安全”从同一个告警框里拆开。只有这样，后续补采和模型训练的结论才可解释。
+
+## 后记（2026-09-29）
+
+夹爪采样时间、录制启动和组帧配置复用的后续修改见[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)；Omega 来源与安全续录增强见[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)。本文的“待修改”是 9 月 22 日的状态，最新状态以台账为准。
+
+<details markdown="1">
+<summary>附录：测试明细</summary>
+
+9 月 21 日之后涉及回放、participation、DDS 隔离等改动的 11 个后端测试文件单独重跑为 425 passed / 0 failed；HAL 的 MotionExecutor、EmergencyStop、ControlLease、ThreadStability、WorkerResilience、ForceTareRuntime 和 ForceCore 等离线测试通过。前端：TypeScript typecheck 通过；测试 430 passed / 4 failed；lint 15 errors。
+
+</details>

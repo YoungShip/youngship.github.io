@@ -8,16 +8,9 @@ tags: [科研记录, MicroMani, HAL, DDS, 故障恢复]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+> **事件日期：**2026-09-29　**整理：**09-29　**关联台账：**[C12](/notes/2026/09/29/micromani-research-status/#C12)
 
-<details markdown="1">
-<summary>展开本页目录</summary>
-
-* 本页目录
-{:toc}
-
-</details>
-
+**本篇结论：**Windows 异常重启后 HAL 启动卡住，原因是 Fast-DDS 共享内存目录里留下的旧端口文件让初始化阻塞；隔离这些闲置文件后，同一个 HAL 约 5 秒恢复。启动脚本已加入“启动前隔离跨重启遗留文件”和“就绪轮询”两项修复，离线测试通过；真实异常重启后的自动恢复还没验证。
 
 ## 启动失败发生在哪里
 
@@ -48,13 +41,7 @@ tags: [科研记录, MicroMani, HAL, DDS, 故障恢复]
 
 ## 验证结果与边界
 
-相关测试命令为：
-
-```powershell
-backend/.venv/Scripts/python.exe -m pytest backend/tests/test_stack_scripts.py backend/tests/test_hal_source_contracts.py -q --tb=short
-```
-
-结果为 **179 passed**，Git 差异检查通过。测试覆盖旧文件恢复、当前启动周期文件保留、同组新旧文件混合、文件占用、自定义 domain、目录缺失和重复执行，以及延迟就绪、超时、进程退出、能力不匹配、LTDMC 初始化失败和备用端口选择。
+相关脚本测试全部通过（命令和用例范围见附录）。
 
 需要区分三种证据：
 
@@ -66,7 +53,20 @@ backend/.venv/Scripts/python.exe -m pytest backend/tests/test_stack_scripts.py b
 
 约 5 秒来自本次恢复后的启动观察，不能视为所有设备状态下的启动耗时保证。自动恢复当前只处理跨系统重启留下的端口文件，不覆盖本次开机期间产生的所有异常残留。
 
-## 代码与本地证据
+## 下一步
+
+在获准的维护时段验证真实异常重启后的自动恢复，并分别记录服务就绪和设备功能检查的结果。
+
+<details markdown="1">
+<summary>附录：测试、提交与诊断文件</summary>
+
+相关测试命令：
+
+```powershell
+backend/.venv/Scripts/python.exe -m pytest backend/tests/test_stack_scripts.py backend/tests/test_hal_source_contracts.py -q --tb=short
+```
+
+结果 179 passed，Git 差异检查通过。覆盖旧文件恢复、当前启动周期文件保留、同组新旧文件混合、文件占用、自定义 domain、目录缺失和重复执行，以及延迟就绪、超时、进程退出、能力不匹配、LTDMC 初始化失败和备用端口选择。
 
 截至本次记录，修复已在 `xie` 分支形成独立提交 `c2f4a41`（修复 HAL 异常重启后的 DDS 启动恢复），**尚未推送**。涉及 `scripts/start-hal.ps1`、`scripts/start-stack.ps1` 和 `backend/tests/test_stack_scripts.py`。
 
@@ -76,4 +76,4 @@ backend/.venv/Scripts/python.exe -m pytest backend/tests/test_stack_scripts.py b
 - `hal-startup-recovery-20260929.json`：恢复后的服务状态记录。
 - `dds-shm-recovery-20260929-152038/`：手动隔离文件及清单。
 
-后续验收应在获准的维护时段验证自动恢复后的启动状态，并分别记录服务就绪和设备功能检查结果。本次写作仅整理既有诊断与测试结果，没有再次启动设备或重跑硬件验证。
+</details>

@@ -8,18 +8,11 @@ tags: [科研记录, MicroMani, 机器人, 数据采集, ACT, 模仿学习]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-> **阅读提示（2026-09-29 整理）：**下文保留原阶段记录及有日期的后补内容；当前状态与后续门槛见上方台账。本次仅增加导航和目录，没有重跑原文实验。
+> **事件日期：**2026-09-20 晚～21　**整理：**09-21　**关联台账：**[A01](/notes/2026/09/29/micromani-research-status/#A01)、[C04](/notes/2026/09/29/micromani-research-status/#C04)、[D08](/notes/2026/09/29/micromani-research-status/#D08)、[E03](/notes/2026/09/29/micromani-research-status/#E03)、[E16](/notes/2026/09/29/micromani-research-status/#E16)
+
+**本阶段结论：**旧模型泛化差，很大一部分可能来自示教起点不统一：开始录制的位置、夹爪开度和准备动作每条都不一样。把软件工作原点作为统一起点、每条开始夹爪保持 26 mm 全开后，起始位置的跨度收紧到几百微米。整理出可追溯的 standard10（10 条、7,361 帧），用同一套 ACT 配置重新训练作为门槛实验。补采时还发现，软件重启前后迟帧率从 24–41% 降到 1–5%。
 
 > **指标口径待核：**本页 hold 约 0.1543，后续记录为 0.145326，尚未确认差异来源；原值保留，见[台账 E16](/notes/2026/09/29/micromani-research-status/#E16)。
-
-<details markdown="1">
-<summary>展开本页目录</summary>
-
-* 本页目录
-{:toc}
-
-</details>
-
 
 上一篇停在一个比较尴尬的位置：旧数据上的单侧 ACT 确实比 14 维基线更好，但验证误差仍然明显高于“保持当前 state”的简单对照。继续盲目加训练步数已经没有太大意义，我需要先回答一个更基础的问题：**是不是采集起点和准备动作本身就不够统一。**
 
