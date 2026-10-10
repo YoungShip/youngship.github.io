@@ -7,8 +7,8 @@
   <meta name="description" content="{{ page.description | default: site.description | escape }}">
   {% if page.robots %}<meta name="robots" content="{{ page.robots | escape }}">{% endif %}
   {% if page.url == '/' and site.google_site_verification %}<meta name="google-site-verification" content="{{ site.google_site_verification | escape }}">{% endif %}
-  <meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111317" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1311" media="(prefers-color-scheme: dark)">
   <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <link rel="canonical" href="{{ page.url | absolute_url }}">
   <meta property="og:site_name" content="{{ site.title | escape }}">
@@ -17,14 +17,18 @@
   <meta property="og:title" content="{{ page.title | default: site.title | escape }}">
   <meta property="og:description" content="{{ page.description | default: site.description | escape }}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
-  {% if page.image %}<meta property="og:image" content="{{ page.image | absolute_url }}">{% endif %}
+  {%- assign share_image = page.image | default: site.og_image %}
+  {% if share_image %}<meta property="og:image" content="{{ share_image | absolute_url }}">{% endif %}
   {% if page.layout == 'post' %}<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">{% if page.last_modified_at %}<meta property="article:modified_time" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}{% endif %}
-  <meta name="twitter:card" content="{% if page.image %}summary_large_image{% else %}summary{% endif %}">
+  <meta name="twitter:card" content="{% if share_image %}summary_large_image{% else %}summary{% endif %}">
   {% feed_meta %}
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%231b222d'/%3E%3Ctext x='20' y='28' text-anchor='middle' font-size='27' font-style='italic' font-family='Georgia' fill='%23f6f4ee'%3Ey%3C/text%3E%3Ccircle cx='30' cy='27' r='2.6' fill='%23e0603f'/%3E%3C/svg%3E">
-  <link rel="preload" href="{{ '/assets/fonts/instrument-serif-latin-400-normal.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}?v=20261009b">
-  <script src="{{ '/assets/site.js' | relative_url }}?v=20261009b" defer></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316201b'/%3E%3Cg fill='none' stroke-width='3.2' stroke-linecap='round'%3E%3Cpath d='M12 20V6' stroke='%23849dff'/%3E%3Cpath d='M12 20h14' stroke='%234cc38a'/%3E%3Cpath d='m12 20-6 6' stroke='%23ff6369'/%3E%3C/g%3E%3Ccircle cx='12' cy='20' r='2.8' fill='%23f3f5f1'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="{{ '/assets/icons/apple-touch-icon.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}?v=20261010a">
+  <script src="{{ '/assets/site.js' | relative_url }}?v=20261010a" defer></script>
+  {%- if page.layout == 'post' %}
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":{{ page.title | jsonify }},"description":{{ page.description | default: site.description | jsonify }},"datePublished":"{{ page.date | date_to_xmlschema }}",{% if page.last_modified_at %}"dateModified":"{{ page.last_modified_at | date_to_xmlschema }}",{% endif %}"inLanguage":"zh-CN","mainEntityOfPage":"{{ page.url | absolute_url }}",{% if page.image %}"image":"{{ page.image | absolute_url }}",{% endif %}"author":{"@type":"Person","name":"YoungShip","url":"{{ '/about/' | absolute_url }}"}}</script>
+  {%- endif %}
 </head>
 {%- assign nav_current = page.nav -%}
 {%- if page.layout == 'post' -%}{%- if page.tags contains 'MicroMani' -%}{%- assign nav_current = 'research' -%}{%- else -%}{%- assign nav_current = 'notes' -%}{%- endif -%}{%- endif %}
@@ -32,7 +36,7 @@
   <a class="skip" href="#main">跳到正文</a>
   <header class="site-header" data-header>
     <div class="shell header-inner">
-      <a class="brand" href="{{ '/' | relative_url }}" aria-label="YoungShip 首页"><span class="monogram" aria-hidden="true">y.</span><span class="brand-name">YoungShip</span></a>
+      <a class="brand" href="{{ '/' | relative_url }}" aria-label="YoungShip 首页">{% include axis-mark.html %}{% include logotype.html %}</a>
       <nav class="site-nav" aria-label="主导航">
         <a class="nav-home" href="{{ '/' | relative_url }}"{% if nav_current == 'home' %} aria-current="page"{% endif %}>首页</a>
         <a href="{{ '/notes/' | relative_url }}"{% if nav_current == 'notes' %} aria-current="{% if page.layout == 'post' %}true{% else %}page{% endif %}"{% endif %}>记录</a>
@@ -49,14 +53,16 @@
   <footer class="site-footer">
     <div class="shell">
       <div class="footer-main">
-        <div class="footer-intro"><a class="footer-brand" href="{{ '/' | relative_url }}">YoungShip<span aria-hidden="true">.</span></a><p>保持好奇，慢慢记录。</p></div>
+        <div class="footer-intro"><a class="footer-logo" href="{{ '/' | relative_url }}" aria-label="YoungShip 首页">{% include logotype.html %}</a><p>保持好奇，慢慢记录。</p></div>
         <nav class="footer-nav" aria-label="页脚导航">
-          <div><span class="footer-label">阅读</span><a href="{{ '/notes/' | relative_url }}">所有记录</a><a href="{{ site.research.overview | relative_url }}">科研记录本</a><a href="{{ '/feed.xml' | relative_url }}">RSS 订阅</a></div>
-          <div><span class="footer-label">关于</span><a href="{{ '/about/' | relative_url }}">关于我</a><a href="https://github.com/YoungShip">GitHub ↗</a></div>
-          <div><span class="footer-label">写作</span><a href="{{ '/admin/' | relative_url }}">写作后台</a><a href="{{ '/admin/help/' | relative_url }}">写作说明</a></div>
+          <a href="{{ '/notes/' | relative_url }}">所有记录</a>
+          <a href="{{ site.research.overview | relative_url }}">科研记录本</a>
+          <a href="{{ '/about/' | relative_url }}">关于我</a>
+          <a href="https://github.com/YoungShip">GitHub</a>
+          <a href="{{ '/feed.xml' | relative_url }}">RSS 订阅</a>
         </nav>
       </div>
-      <div class="footer-bottom"><small>© {{ 'now' | date: '%Y' }} YoungShip</small><small>Jekyll 构建 · GitHub Pages 托管</small></div>
+      <div class="footer-bottom"><small>© {{ 'now' | date: '%Y' }} YoungShip</small><small class="footer-admin"><a href="{{ '/admin/' | relative_url }}">写作后台</a><a href="{{ '/admin/help/' | relative_url }}">写作说明</a></small></div>
     </div>
   </footer>
 </body>

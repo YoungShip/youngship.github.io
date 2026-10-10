@@ -1,6 +1,5 @@
 {%- assign entry_category = include.post.category | default: '笔记' -%}
-<li class="entry" data-note data-category="{{ entry_category | escape }}" data-tags="{{ include.post.tags | join: ' ' | escape }}" data-search="{{ include.post.title | escape }} {{ include.post.description | escape }} {{ include.post.tags | join: ' ' | escape }} {{ entry_category | escape }}">
+<li class="entry" data-note data-category="{{ entry_category | escape }}" data-tags="{{ include.post.tags | join: ' ' | escape }}" data-search="{{ include.post.title | escape }} {{ include.post.description | escape }} {{ include.post.tags | join: ' ' | escape }} {{ entry_category | escape }} {{ include.post.date | date: '%Y-%m-%d %Y.%m.%d' }}">
   <div class="entry-meta"><span class="entry-no">{% include entry-no.html post=include.post %}</span><time datetime="{{ include.post.date | date: '%Y-%m-%d' }}">{{ include.post.date | date: '%Y.%m.%d' }}</time><span class="tag" data-cat="{{ entry_category | escape }}">{{ entry_category | escape }}</span></div>
   <div class="entry-body"><h{{ include.level | default: 3 }} class="entry-title"><a href="{{ include.post.url | relative_url }}">{% include post-title.html post=include.post %}</a></h{{ include.level | default: 3 }}><p class="entry-desc">{{ include.post.description | escape }}</p>{% if include.post.tags contains '科研索引' %}<span class="entry-label">科研索引</span>{% endif %}</div>
-  <span class="entry-arrow" aria-hidden="true">↗</span>
 </li>
