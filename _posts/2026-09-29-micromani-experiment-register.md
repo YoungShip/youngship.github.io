@@ -9,15 +9,7 @@ tags: [科研记录, MicroMani, 科研索引]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-<details markdown="1">
-<summary>展开本页目录</summary>
-
-* 本页目录
-{:toc}
-
-</details>
-
-**更新至 2026-10-10（含 D05 上的 M04、M05）。**这里登记每批数据、每个模型的划分、口径和结果。不同表的数据、划分和评估口径不同，不能跨表直接排名；用来挑 best 的验证集不是独立 test。D / M 编号只用于本页检索。
+**更新至 2026-10-11（含 D05 上的 M04、M05，以及迟帧诊断段）。**这里登记每批数据、每个模型的划分、口径和结果。不同表的数据、划分和评估口径不同，不能跨表直接排名；用来挑 best 的验证集不是独立 test。D / M 编号只用于本页检索。
 
 ## 数据集索引
 {: #datasets }
