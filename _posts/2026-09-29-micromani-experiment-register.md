@@ -1,6 +1,7 @@
 ---
 title: "MicroMani 实验与数据索引：划分、模型结果与比较边界"
 date: "2026-09-29"
+last_modified_at: "2026-10-11"
 description: "按数据集整理 ACT 实验与部署证据，明确窗口、归一化、hold 和任务验收的比较边界。"
 category: 笔记
 tags: [科研记录, MicroMani, 科研索引]
@@ -28,9 +29,19 @@ tags: [科研记录, MicroMani, 科研索引]
 | D03：strict23 | 14 train / 9 validation；本索引不补猜总帧数 | 与 usable53 的验证集合不同，不能直接按模型误差判断数据筛选优劣。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D04：usable53 | 38 train / 15 validation；21,480 个训练窗、6,937 个验证窗；severe mask 后保留 21,145 个训练窗 | mask 只作用训练，验证不筛；归一化文件核对一致。81 个标记帧影响 335 个重叠窗口，不等于 335 个坏帧。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D05：历史 109 条 / 48,961 帧 | 87 train / 22 validation；训练窗 36,566→36,496，验证保留全部 9,234 窗 | 固定种子 20260927；五个副本未物理合并。按最终 JSON 清单读取，不能直接扫描目录。9 月 29 日时尚未训练；10 月 3 日起用于 M04、M05 长训，仍不能替代新 V1 验收。[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/) · [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
-| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)。2026-10-10 补记：其中重启后 0.24% 的那条（yxp_v1_1458）与另一条 yxp_v1_1432 均已作废，不计 probe；采集完整性修复后尚未新录，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)。2026-10-10 补记：其中重启后 0.24% 的那条（yxp_v1_1458）与另一条 yxp_v1_1432 均已作废，不计 probe；采集完整性修复后尚未新录，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)。2026-10-11 补记：这两条作为迟帧排查诊断段的数字与比较边界，见下方[迟帧诊断段](#late-frame-diagnostics) |
 
 D05 最终入口为 `combined-train-validation-split-20260927.json`。yxp v1 副本仍保留本轮排除项；取数需结合元数据与原生映射。归一化只用对应 87 条训练数据。**文件完整、任务成功、符合采集规范和选入某轮训练，是不同判定。**
+
+### 迟帧排查诊断段（不计入数据集）
+{: #late-frame-diagnostics }
+
+| 数据 | 帧数 | 迟帧 | 用途与限制 |
+| --- | ---: | ---: | --- |
+| `yxp_v1_1432 / episode_000000` | 1322 | 542，约 40.9985% | 修正前的高迟帧诊断段；平均等待数据约 18.2 ms、组帧约 1.8 ms，用于分析反馈等待 |
+| `yxp_v1_1458 / episode_000000` | 1274 | 3，约 0.2355% | 实时历史精简与锁外序列化部署后的单段观察；相机零掉帧，平均等待约 1.5 ms；起始开口不符合 26 mm 协议，末帧偏差约 60.333 ms |
+
+两段均沿用已有 `invalid / deleted` 状态，不增加正式数据或已验收 probe。前后软件版本、遥操作臂重启与重新标定、操作轨迹都不同，**不是受控 A/B 实验**；这次比较没有产生新的训练划分、归一化统计、模型训练或任务成功率。2026-10-10 完成的是相关源码的整理、验证与推送，不是重新执行这两条录制；历史运行环境还含其他未提交改动，不能仅凭提交号重建实验条件。详见[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)。
 
 ## 动作与指标契约
 {: #contracts }
