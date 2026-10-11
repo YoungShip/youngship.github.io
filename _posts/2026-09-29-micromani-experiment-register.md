@@ -9,7 +9,7 @@ tags: [科研记录, MicroMani, 科研索引]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-11（含 D05 上的 M04、M05，以及迟帧诊断段）。**这里登记每批数据、每个模型的划分、口径和结果。不同表的数据、划分和评估口径不同，不能跨表直接排名；用来挑 best 的验证集不是独立 test。D / M 编号只用于本页检索。
+**更新至 2026-10-11（含 D05 上的 M04、M05，迟帧诊断段，以及阶段九的 D07～D09、M06～M08）。**这里登记每批数据、每个模型的划分、口径和结果。不同表的数据、划分和评估口径不同，不能跨表直接排名；用来挑 best 的验证集不是独立 test。D / M 编号只用于本页检索。
 
 ## 数据集索引
 {: #datasets }
@@ -21,7 +21,10 @@ tags: [科研记录, MicroMani, 科研索引]
 | D03：strict23 | 14 train / 9 validation；本索引不补猜总帧数 | 与 usable53 的验证集合不同，不能直接按模型误差判断数据筛选优劣。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D04：usable53 | 38 train / 15 validation；21,480 个训练窗、6,937 个验证窗；severe mask 后保留 21,145 个训练窗 | mask 只作用训练，验证不筛；归一化文件核对一致。81 个标记帧影响 335 个重叠窗口，不等于 335 个坏帧。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D05：历史 109 条 / 48,961 帧 | 87 train / 22 validation；训练窗 36,566→36,496，验证保留全部 9,234 窗 | 固定种子 20260927；五个副本未物理合并。按最终 JSON 清单读取，不能直接扫描目录。9 月 29 日时尚未训练；10 月 3 日起用于 M04、M05 长训，仍不能替代新 V1 验收。[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/) · [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
-| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)。2026-10-10 补记：其中重启后 0.24% 的那条（yxp_v1_1458）与另一条 yxp_v1_1432 均已作废，不计 probe；采集完整性修复后尚未新录，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)。2026-10-11 补记：这两条作为迟帧排查诊断段的数字与比较边界，见下方[迟帧诊断段](#late-frame-diagnostics) |
+| D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)。2026-10-10 补记：其中重启后 0.24% 的那条（yxp_v1_1458）与另一条 yxp_v1_1432 均已作废，不计 probe；采集完整性修复后尚未新录，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)。2026-10-11 补记：这两条作为迟帧排查诊断段的数字与比较边界，见下方[迟帧诊断段](#late-frame-diagnostics)。2026-10-11 补记：10-09 晚另采了正式批 y_v1_2144（D07），没有经过 5 条 probe 验收；10-11 换竖直工作原点后重采 D08、D09，见[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| D07：y_v1_2144 / 50 条 | 40 train / 10 validation（ep 0、6、11、16、17、20、23、51、52、55） | 10-09 采，录 56 条删 5 条、ep47 由 ep55 替补。旧水平 W；Pitch 被 ±1° 软限位卡住；ep39 前后抓取 Roll 约 72° / 91° 两种做法。只作诊断，不与 D08 混用。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| D08：yxp_1011_v1 / 50 条 | 40 train / 10 validation（ep 2、7、13、14、22、25、30、39、43、46） | 10-11 采，竖直 W（硬件左臂 Roll 机械原点 +93°）；ep19 标记删除。Pitch ±0.1° 锁住；零件位置 x −6～+6、y −4～+9 mm，右上偏空。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| D09：yxp_1011_fixed_v1 | 采集中，截至 10-11 整理时 3 条 | 零件固定在同一点；计划 30～50 条，与 D08 同 W、同相机。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 
 D05 最终入口为 `combined-train-validation-split-20260927.json`。yxp v1 副本仍保留本轮排除项；取数需结合元数据与原生映射。归一化只用对应 87 条训练数据。**文件完整、任务成功、符合采集规范和选入某轮训练，是不同判定。**
 
@@ -91,6 +94,39 @@ relative target 是 `action(t+h) - observation.state(t)`，不是相邻帧增量
 
 来源：[阶段八](/notes/2026/10/04/micromani-d05-day-training/)，10 月 10 日重读两轮 `STATUS.json` 核对。契约：87 train / 22 validation，活动侧 7D、三路 640×480、relative 目标、horizon 30、batch 40，训练侧 severe-only mask、validation 不筛，归一化只用 87 条训练数据，seed 20260927。M04 父 run 到续训只继承权重、重置 AdamW 与采样器，step 连续不代表训练轨迹连续；M05 从 step 0 起全程保存完整断点，117,096 处严格恢复一次。两轮初始化方式不同，M05 更好不能单独归因于优化器是否重置。22 条 validation 已反复用于选 checkpoint，不是独立 test。与 D04 / M03 的数据和验证集不同，不直接排名。
 
+### M06：D07（y2144）基线与去 Pitch
+
+| D07，同一 10 条 validation | Full-30 L1 | hold | 好多少 | Best 轮 |
+| --- | ---: | ---: | ---: | ---: |
+| 7 维基线（3090） | 0.135 | 0.161 | 约 16%（只算 6 维 26.5%） | 39 |
+| 去掉 Pitch，6 维（RTX 6000） | — | 0.1251 | 25.4% | 39 |
+
+来源：[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)。契约同 M05（relative、horizon 30、batch 40、不开 VAE），seed 20261010，归一化只用 40 条训练数据。7 维成绩被 Pitch 的限位噪声拉低，6 维两次结果相当。
+
+### M07：D05 抽 40 条（检验条数影响）
+
+| D05 原 22 条 validation | Full-30 L1 | 好多少 | Best 轮 |
+| --- | ---: | ---: | ---: |
+| 子集 A（40 条：抓放 21、装配 19） | 0.1016 | 36.2% | 27 |
+| 子集 B（另抽 40 条，与 A 重复 21 条） | 0.1025 | 35.9% | 21 |
+
+来源：[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)。seed 20260927，归一化只用各自 40 条重新计算，hold 因此与 M05 略有出入，比较看百分比。两次抽样几乎一致，与 M05 全量约 42% 相差约 6 个百分点。
+
+### M08：D08（yxp_1011_v1）基线与 6 种改法
+
+| D08，同一 10 条 validation，6 维 | Full-30 好多少 | 第 5 步好多少 | 抓取前 x / y（第 5 步） | Best 轮 |
+| --- | ---: | ---: | --- | ---: |
+| 基线（full-30 0.1840，hold 0.2401） | 23.4% | 10.2% | — | 15 |
+| 基线（第 1 步最好） | 22.2% | 11.4% | 0% / −2% | 21 |
+| 图像增强 | 22.6% | 9.7% | −1% / −3% | 15 |
+| 增强 + 腕部放大 | 22.8% | 10.6% | −1% / −3% | 21 |
+| 开 VAE | 22.4% | 8.1% | −6% / 2% | 21 |
+| 增强 + VAE | 22.7% | 8.3% | −9% / −8% | 15 |
+| 不给状态输入 | 24.2% | 9.9% | −6% / −4% | 24 |
+| 辅助任务（预测零件位置） | −0.1% | −1.2% | −2% / −1% | 21 |
+
+来源：[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)。全部在 RTX 6000 上训练，seed 20261010，早停：至少 30 轮、之后连续 15 轮整段误差未降 0.5% 即停、最多 150 轮（基线未用早停，手动停于第 61 轮）。每个做法只跑一次，2 个百分点以内不可分。"抓取前 x / y" 是接近阶段的对准分量，所有做法都在 0 左右；起点预测与零件位置的相关性也约为 0。M08 与 M05 / M06 的数据、W 和验证集都不同，不跨表排名。
+
 ## 部署和真实任务证据不能混写
 {: #deployment }
 
@@ -102,6 +138,8 @@ relative target 是 `action(t+h) - observation.state(t)`，不是相邻帧增量
 | M05 两候选部署前审计（10-06） | 全 9,234 窗复算与训练期一致；旧 offset=5 异常门接受 68.15% / 64.50%；Live Dry-Run 各 10 次，通过 8 / 7 次，被拒均为 Roll / Pitch，已提交的 15 次全部 sent=false、状态变化 0 | 能放宽异常门；已满足真实运动前置条件（力安全自检未完成、活动侧不在 W，真实单步未发送） |
 | severe-mask 单步与短段连续空载 | 有受限单步及约 6 步、约 20 步尝试；出现同向漂移并触及当次范围限制 | 已完成自主 A→B；临时试跑界面仍为当前正式功能 |
 | GPT 视觉抓取 | 实验结束，未成功抓起，独立日志保留，实验代码撤回 | 形成了同步成功示教；真实接触停止或恒力控制已验收 |
+| M06 7 维基线连续实机（10-10，旧水平 W） | 全速 612 步、示范速度 891 步，全部被接受执行；两次都在 Roll 约 26～34° 回转、偏出示范范围后卡住，未碰零件 | 能据此评价抓取能力：当时夹爪命令实际未下发（见[台账 B17](/notes/2026/09/29/micromani-research-status/#B17)） |
+| M08 连续实机（10-11，竖直 W） | 约 9 次运行：基线第 21 轮在一个零件位置完成一次完整抓放；不给状态一次重试夹起后被误停；其余合空、未降到位或碰歪零件 | 自主抓放成功率；成功不代表模型会按零件位置对准，三个位置合夹爪的点几乎相同 |
 
 ACT 证据见[阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)和[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)，GPT 见[专项复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/)。限幅后的实际运动与原始预测轨迹不同；软件保护测试、无动作试跑、空载运动和任务成功必须分开计数。
 
