@@ -11,7 +11,7 @@ tags: [科研记录, MicroMani, 科研索引]
 
 **更新至 2026-10-11。**每个问题占一行，只写现在的状态和下一步；过程、证据和历次补记在“出处”链接的原文里。编号固定不变，新问题接在各组末尾。
 
-**当前最要紧的：**10 月 8 日回工作原点时出现危险的多圈规划（[A04](#A04)、[A09](#A09)），所有实机操作暂停，先查清计数基准并加上大位移拒绝。采集软件的完整性修复已加载但还没有新录制验证，合格 probe 仍为 0（[C04](#C04)、[C09](#C09)、[C16](#C16)）。
+**当前最要紧的：**模型不会按零件位置对准（[E18](#E18)），实机只有一次属于位置巧合的抓放（[E15](#E15)）；下一步采固定位置数据。硬件右臂的多圈规划（[A04](#A04)、[A09](#A09)）仍未解决，10 月 10 日起只在硬件左臂上恢复实机。采集完整性修复已加载、仍未提交（[C04](#C04)、[C09](#C09)、[C16](#C16)）。
 
 ## 状态怎么读
 {: #status-tags }
@@ -43,7 +43,8 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="A06"></a>**A06** | X/Z 等轴找不到 HOME | 未解决 | 会一直走到端部或超时；需核对 HOME 输入、方向、限位逻辑和轴映射 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A07"></a>**A07** | 限位端作为机械参考 | 已修改待验收 | 已有显式正限位模式（起点 EL+ 无效、终点有效且停稳）；重复定位精度未测 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A08"></a>**A08** | 顺序寻零与参考实例绑定 | 离线通过 | `c0bfbb4` 起一轴完成再启动下一轴；实例绑定检测不到计数复位（见 A09）；待现场验收 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
-| <a id="A09"></a>**A09** | 保存的 W 与控制卡计数基准失配 | 未解决 | 10-08 回 W 时当前计数为 0，W 仍是 09-24 的多圈计数；归零原因待核。实机暂停，禁止直接回 W、寻零或取模修正 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
+| <a id="A09"></a>**A09** | 保存的 W 与控制卡计数基准失配 | 未解决 | 10-08 硬件右臂回 W 时当前计数为 0，W 仍是 09-24 的多圈计数；归零原因待核，右臂禁止回 W、寻零或取模修正。10-10 起只在硬件左臂恢复实机 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="A10"></a>**A10** | 硬件左臂竖直工作原点（10-11） | 现场通过（单次） | 竖直朝下、零件上方 5～10 mm，Roll 为机械原点 +93°；之后多次回 W 均为小幅移动。左臂计数基准是否连续未专门核对 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 
 ## B. 遥操作与控制链路
 {: #B }
@@ -65,6 +66,9 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="B13"></a>**B13** | 主手重力补偿在边缘抽搐 | 现场通过（单次） | 手柄放进标定孔重新标定后消失，原因为推断；开机前先把手柄放进标定孔 | [Omega 抽搐](/notes/2026/10/09/micromani-omega-calibration-twitch/) |
 | <a id="B14"></a>**B14** | 双侧夹爪串口互相阻塞 | 已修改待验收 | 两侧调度分离、阻塞后只执行最新目标（`a5deb6a`）；用户反馈夹爪灵敏，未重复验收 | [新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 | <a id="B15"></a>**B15** | 回 W 期间运动遥测停更 | 已修改待验收 | 锁内等待运动完成导致遥测停更、界面报“WS 不可用”；改为等待中读真实位置，当天部署，未做回 W 实机复验 | [迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/) |
+| <a id="B16"></a>**B16** | 策略接口重复使能导致连续动作被拒 | 现场通过（单次） | 已使能时不再重复使能（`d0ec8de`，本地未推送）；两天约 11 次实机运行正常，未做专门验收 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
+| <a id="B17"></a>**B17** | 策略接口在夹爪开关关闭时静默跳过夹爪 | 临时方案 | 急停会关掉夹爪使能，之后模型的夹爪目标不下发；实机脚本补发使能命令绕过，主程序未改 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
+| <a id="B18"></a>**B18** | Pitch 软限位 0～0 使 HAL 拒绝所有目标 | 临时方案 | HAL 要求最小值小于最大值；改为 ±0.1° 等效锁住 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 
 ## C. 数据采集与系统稳定性
 {: #C }
@@ -79,7 +83,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C06"></a>**C06** | 成功的 767 帧示教 | 待核 | 抓放成功，但放置阶段有 3 个夹爪对齐超限点（50–63 ms），先不入训 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="C07"></a>**C07** | GPT 动作转训练标签 | 已结束 | GPT 动作未接入录制器的动作来源，随 GPT 路线结束 | [GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/) |
 | <a id="C08"></a>**C08** | 录制开头保留静止画面 | 已修改待验收 | 操作规范：显示录制中后主手静止约 0.5 秒再开始；待数据验收 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
-| <a id="C09"></a>**C09** | 完整录制起点门槛 | 已修改待验收 | 10-09 源码补门槛：重验 W，夹爪 ±1 mm 内稳定 300 ms 才写第 0 帧；已加载未提交，待实测 | [阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="C09"></a>**C09** | 完整录制起点门槛 | 已修改待验收 | 10-09 源码补门槛：重验 W，夹爪 ±1 mm 内稳定 300 ms 才写第 0 帧；已加载未提交。10-11 采集中按设计拦下夹爪未张开的起点（单次） | [阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="C10"></a>**C10** | 多人共用的采集规范 | 已定位 | 通用保护与按数据集保存的任务规范分开；待实现 | [阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/) |
 | <a id="C11"></a>**C11** | 质量检查按参与侧判断 | 已修改待验收 | 10-09 改为按显式参与侧，覆盖纯旋转和夹爪为主的动作；离线通过，待实测 | [阶段四](/notes/2026/09/22/micromani-quality-and-stability/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C12"></a>**C12** | HAL 异常重启后的启动阻塞 | 离线通过 | 手动隔离遗留文件后恢复；自动恢复离线通过，真实异常重启未验证 | [HAL 专题](/notes/2026/09/29/micromani-hal-startup-recovery/) |
@@ -87,6 +91,8 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C14"></a>**C14** | 首次录制冷启动导致断连 | 已修改待验收 | 前端等待 10→60 秒；10-09 续期请求发出前过期致断连，依赖改为启动时预热，原超时未复现；待现场验收 | [新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/) |
 | <a id="C15"></a>**C15** | 右力传感 watchdog 超时锁存 | 未解决 | 10-08 右力传感不健康、因 watchdog 超时锁存；原因待核，未发解锁或运动指令 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
 | <a id="C16"></a>**C16** | 夹爪动作未按帧时刻取值 | 已修改待验收 | 较晚的夹爪目标可能写进较早的帧；改为按时标取值，离线复现与回归通过，已加载未提交，待实测 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="C17"></a>**C17** | 起点夹爪未张开要去遥操作页处理 | 已修改待验收 | 开始前低于 25 mm 弹窗、可一键张开（`4f41724`，本地未推送）；已打包，未在界面验证 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
+| <a id="C18"></a>**C18** | 复位间隙报“夹爪反馈过期” | 已修改待验收 | HAL 只在遥操作运行时读夹爪，警告全部出在复位后重启时，录制中过期为 0；遥操作停止时不再告警（`e8d1e61`），待重启后端 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 
 ## D. 数据集与数据契约
 {: #D }
@@ -122,11 +128,15 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="E12"></a>**E12** | 旧模型连续执行 | 已结束 | 约 6 步、约 20 步后同向漂移触到范围限制，已暂停 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="E13"></a>**E13** | 旧模型完整请求耗时 | 已完成 | 四次 273–648 ms，含读图、推理和 dry-run，不是控制频率 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="E14"></a>**E14** | 实验基准变化 | 已完成 | 09-23 工作原点和相机变化、10-08 global 再变；各批数据按视角分开使用 | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)、[相机改位](/notes/2026/10/08/micromani-global-camera-relayout/) |
-| <a id="E15"></a>**E15** | 自主抓放实机验证 | 未解决 | 还没有一次自主抓放成功；10-08 起实机暂停（见 A09） | [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
+| <a id="E15"></a>**E15** | 自主抓放实机验证 | 现场通过（单次） | 10-11 硬件左臂完成一次完整抓放，但零件正好在模型固定去的点；另一次夹起后被误停。成功率未建立 | [阶段八](/notes/2026/10/04/micromani-d05-day-training/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="E16"></a>**E16** | standard10 hold 指标口径 | 待核 | 阶段二记 0.1543，阶段五记 0.145326，差异来源未查 | [口径待核](/notes/2026/09/29/micromani-experiment-register/#metric-caveats) |
+| <a id="E17"></a>**E17** | y2144 比 hold 只好约 16% | 已完成 | 不是条数问题（D05 抽 40 条约 36%）；原因是 Pitch 限位噪声、Roll 大转与回调、抓取角度两种做法 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="E18"></a>**E18** | 模型不会按零件位置对准 | 未解决 | yxp_1011_v1 上基线与 6 种改法都在 22～24%，起点预测与零件位置无关；先采固定位置数据，再考虑显式零件定位 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 
 ## 当前决定与验收顺序
 {: #acceptance }
+
+> **2026-10-11 补记：**10 月 10 日起用户决定在**硬件左臂**上恢复回 W 和 ACT 实机，重设了竖直工作原点并采了新数据，实机靠脚本里的高度、范围和力限保护；[A04](#A04)、[A09](#A09) 的关闭条件不变，硬件右臂仍不回 W、不寻零。下一步改为：固定位置采集 → 两个模型对比 → 固定位置实机 10 次（见[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)的“下一步”）。
 
 **10 月 8 日起，所有实机步骤（回 W、机械寻零、ACT 试跑）都要等 [A09](#A09) 的计数基准查清、[A04](#A04) 的大位移拒绝加上之后再继续。**之后的常规采集 / ACT 路线是：
 
@@ -153,6 +163,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | 工控机 MicroMani 主仓库 | 9 月 29 日此前核对到 `xie/c2f4a41` | 是源码快照；启动专题当时记为尚未推送，不能据此确认当前远端或运行二进制 |
 | 工控机 MicroMani 主仓库（2026-10-09 补记） | `xie/42cce5c`（10-08），另有 33 个修改、18 个新增的未提交文件；HalServer 与后端 10-09 14:53 启动 | 只读查看提交与文件时间；未核对运行二进制对应哪份源码，未提交改动不算已验收，见[补记](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 | 工控机 MicroMani 主仓库（2026-10-10 补记） | 远端 `xie/2a99555`（10-10 推送：以 `42cce5c` 为基线拆成五个连续提交，止于 `2a99555`）；工作区另有 49 个改动 / 未跟踪文件，含 C03/C04/C09/C11/C16 完整性修复（10-09 21:06 后端已加载） | 远端分支 10-10 用 `git ls-remote` 核对；运行版本 = 已推送提交 + 未提交改动，正式采集前需冻结，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| 工控机 MicroMani 主仓库（2026-10-11 补记） | 本地 `xie` 在 `2a99555` 之上新增 `e8d1e61`、`d0ec8de`、`4f41724`（按功能拆分，均未推送）；工作区仍有 32 个修改、17 个未跟踪文件，含 C03/C09/C11/C16 修复 | 三个提交各自在 HEAD 临时检出上验证；`e8d1e61` 需重启后端、`4f41724` 需刷新页面才生效，见[实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | 连接与寻零专题 | 公开 `xie/400cde0` 固定源码证据 | 是另一轮源码审计范围，不代表生产目录回退或正在运行该版本 |
 
 版本出处见[数据续录记录](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)、[寻零专题](/notes/2026/09/23/micromani-homing-completion-semantics/)和[HAL 专题](/notes/2026/09/29/micromani-hal-startup-recovery/)。本次只核对笔记仓库，没有重查上述机器人工作区、构建产物或设备。
