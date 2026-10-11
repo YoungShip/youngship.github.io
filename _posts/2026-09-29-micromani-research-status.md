@@ -69,6 +69,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="B16"></a>**B16** | 策略接口重复使能导致连续动作被拒 | 现场通过（单次） | 已使能时不再重复使能（`d0ec8de`，本地未推送）；两天约 11 次实机运行正常，未做专门验收 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="B17"></a>**B17** | 策略接口在夹爪开关关闭时静默跳过夹爪 | 临时方案 | 急停会关掉夹爪使能，之后模型的夹爪目标不下发；实机脚本补发使能命令绕过，主程序未改 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="B18"></a>**B18** | Pitch 软限位 0～0 使 HAL 拒绝所有目标 | 临时方案 | HAL 要求最小值小于最大值；改为 ±0.1° 等效锁住 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
+| <a id="B19"></a>**B19** | 配置文件被占用致主手连接 / 断开失败 | 临时方案 | RDC 子进程占用 `config.json`，保存被拒、前端报 Failed to fetch；重启 RDC 恢复一次后复发；重试逻辑在工作区未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 
 ## C. 数据采集与系统稳定性
 {: #C }
@@ -95,6 +96,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C18"></a>**C18** | 复位间隙报“夹爪反馈过期” | 已修改待验收 | HAL 只在遥操作运行时读夹爪，警告全部出在复位后重启时，录制中过期为 0；遥操作停止时不再告警（`e8d1e61`），待重启后端 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="C19"></a>**C19** | 安全中断后重试混入上一次尝试的帧 | 已修改待验收 | y2144 ep22 实际 763 帧、记录 636 帧；10-09 22:47 起保存前核对帧数，ep22 已隔离、未入训；改动未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C20"></a>**C20** | 录制准备阶段主从运动未锁住 | 已修改待验收 | 10-09 22:11 起准备阶段 HAL 不放行运动与夹爪命令，就绪后放行；部署时未做实机运动测试；改动未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="C21"></a>**C21** | 悬空静置时力 / 力矩超过解锁门槛 | 未解决 | 10-09 硬件左 Fy −2.005 N、Mx 0.0274 N·m 均超；零点、线缆、自重未区分；之后锁存曾解除 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 
 ## D. 数据集与数据契约
 {: #D }
@@ -165,7 +167,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | 工控机 MicroMani 主仓库 | 9 月 29 日此前核对到 `xie/c2f4a41` | 是源码快照；启动专题当时记为尚未推送，不能据此确认当前远端或运行二进制 |
 | 工控机 MicroMani 主仓库（2026-10-09 补记） | `xie/42cce5c`（10-08），另有 33 个修改、18 个新增的未提交文件；HalServer 与后端 10-09 14:53 启动 | 只读查看提交与文件时间；未核对运行二进制对应哪份源码，未提交改动不算已验收，见[补记](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 | 工控机 MicroMani 主仓库（2026-10-10 补记） | 远端 `xie/2a99555`（10-10 推送：以 `42cce5c` 为基线拆成五个连续提交，止于 `2a99555`）；工作区另有 49 个改动 / 未跟踪文件，含 C03/C04/C09/C11/C16 完整性修复（10-09 21:06 后端已加载） | 远端分支 10-10 用 `git ls-remote` 核对；运行版本 = 已推送提交 + 未提交改动，正式采集前需冻结，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
-| 工控机 MicroMani 主仓库（2026-10-11 补记） | 本地 `xie` 在 `2a99555` 之上新增 `e8d1e61`、`d0ec8de`、`4f41724`（按功能拆分，均未推送）；工作区仍有 32 个修改、17 个未跟踪文件，含 C03/C09/C11/C16 修复 | 三个提交各自在 HEAD 临时检出上验证；`e8d1e61` 需重启后端、`4f41724` 需刷新页面才生效，见[实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/)。同日 18:00 又本地提交四项完整性修复（`d5c694c`、`8d566ca`、`2647e07`、`fb8e86c`），`xie` 领先远端 7 个提交、均未推送；10-09 晚部署的回 W 确认重试、录制起点保持（含 HAL）、录制进度、中断丢弃四处改动仍只在工作区并在运行，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| 工控机 MicroMani 主仓库（2026-10-11 补记） | 本地 `xie` 在 `2a99555` 之上新增 `e8d1e61`、`d0ec8de`、`4f41724`（按功能拆分，均未推送）；工作区仍有 32 个修改、17 个未跟踪文件，含 C03/C09/C11/C16 修复 | 三个提交各自在 HEAD 临时检出上验证；`e8d1e61` 需重启后端、`4f41724` 需刷新页面才生效，见[实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/)。同日 18:00 又本地提交四项完整性修复（`d5c694c`、`8d566ca`、`2647e07`、`fb8e86c`），`xie` 领先远端 7 个提交；19:00 左右推送失败（SSH 连接被关闭），10-11 核对远端仍为 `2a99555`；10-09 晚部署的回 W 确认重试、录制起点保持（含 HAL）、录制进度、中断丢弃四处改动仍只在工作区并在运行，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | 连接与寻零专题 | 公开 `xie/400cde0` 固定源码证据 | 是另一轮源码审计范围，不代表生产目录回退或正在运行该版本 |
 
 版本出处见[数据续录记录](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)、[寻零专题](/notes/2026/09/23/micromani-homing-completion-semantics/)和[HAL 专题](/notes/2026/09/29/micromani-hal-startup-recovery/)。本次只核对笔记仓库，没有重查上述机器人工作区、构建产物或设备。
