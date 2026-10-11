@@ -34,7 +34,7 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 
 ## 现在卡在哪里
 
-1. **实机安全：**硬件右臂保存的工作原点和控制卡计数基准失配，普通回工作原点也没有“转太多就拒绝”的检查，仍未解决（[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)）。10 月 10 日起用户决定在硬件左臂上恢复实机，靠实机脚本里的高度、范围和力限保护（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）。
+1. **实机安全：**硬件右臂保存的工作原点和控制卡计数基准失配，普通回工作原点也没有“转太多就拒绝”的检查，仍未解决（[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)）。10 月 10 日起用户决定在硬件左臂上恢复 ACT 实机（左臂回 W 和遥操作采集 10-09 晚已在进行），靠实机脚本里的高度、范围和力限保护（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）。
 2. **采集验收：**按 V1 流程合格的 probe 仍为 0。修复加载后已录 D07、D08 两批，还没用它们核对起点门槛和夹爪时标；D07 录制中后端换过三个版本，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/)（[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C09](/notes/2026/09/29/micromani-research-status/#C09)、[C16](/notes/2026/09/29/micromani-research-status/#C16)）。
 3. **模型上机：**夹爪接通后，第一次完成了一次完整抓放，但只是位置巧合；模型不按零件位置调整，先用固定位置数据把一条路线学准（[E15](/notes/2026/09/29/micromani-research-status/#E15)、[E18](/notes/2026/09/29/micromani-research-status/#E18)）。
 
