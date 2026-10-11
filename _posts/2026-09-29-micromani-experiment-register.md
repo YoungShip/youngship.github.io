@@ -22,7 +22,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | D04：usable53 | 38 train / 15 validation；21,480 个训练窗、6,937 个验证窗；severe mask 后保留 21,145 个训练窗 | mask 只作用训练，验证不筛；归一化文件核对一致。81 个标记帧影响 335 个重叠窗口，不等于 335 个坏帧。[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | D05：历史 109 条 / 48,961 帧 | 87 train / 22 validation；训练窗 36,566→36,496，验证保留全部 9,234 窗 | 固定种子 20260927；五个副本未物理合并。按最终 JSON 清单读取，不能直接扫描目录。9 月 29 日时尚未训练；10 月 3 日起用于 M04、M05 长训，仍不能替代新 V1 验收。[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/) · [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
 | D06：新固定起点 V1 | 5 条完整 probe，随后正式约 30～40 条是计划，不是已验收数量 | 不用 D05 替代现场验收；W、相机布置、起点和关键阶段对齐需重新核验。[当前台账](/notes/2026/09/29/micromani-research-status/#acceptance)。2026-10-09 补记：新 global 视角下已试采 10 条，质量评估均建议重录，尚无合格 probe，见[试采记录](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)。2026-10-10 补记：其中重启后 0.24% 的那条（yxp_v1_1458）与另一条 yxp_v1_1432 均已作废，不计 probe；采集完整性修复后尚未新录，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)。2026-10-11 补记：这两条作为迟帧排查诊断段的数字与比较边界，见下方[迟帧诊断段](#late-frame-diagnostics)。2026-10-11 补记：10-09 晚另采了正式批 y_v1_2144（D07），没有经过 5 条 probe 验收；10-11 换竖直工作原点后重采 D08、D09，见[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
-| D07：y_v1_2144 / 50 条 | 40 train / 10 validation（ep 0、6、11、16、17、20、23、51、52、55） | 10-09 采，录 56 条删 5 条、ep47 由 ep55 替补。旧水平 W；Pitch 被 ±1° 软限位卡住；ep39 前后抓取 Roll 约 72° / 91° 两种做法。只作诊断，不与 D08 混用。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| D07：y_v1_2144 / 50 条 | 40 train / 10 validation（ep 0、6、11、16、17、20、23、51、52、55） | 10-09 采，录 56 条删 5 条、ep47 由 ep55 替补。旧水平 W；Pitch 被 ±1° 软限位卡住；ep39 前后抓取 Roll 约 72° / 91° 两种做法。只作诊断，不与 D08 混用。2026-10-11 补记：录于完整性修复加载之后，但录制中后端换过三个版本，不是同一冻结版本，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/)。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | D08：yxp_1011_v1 / 50 条 | 40 train / 10 validation（ep 2、7、13、14、22、25、30、39、43、46） | 10-11 采，竖直 W（硬件左臂 Roll 机械原点 +93°）；ep19 标记删除。Pitch ±0.1° 锁住；零件位置 x −6～+6、y −4～+9 mm，右上偏空。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | D09：yxp_1011_fixed_v1 | 采集中，截至 10-11 整理时 3 条 | 零件固定在同一点；计划 30～50 条，与 D08 同 W、同相机。[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 
@@ -138,7 +138,7 @@ relative target 是 `action(t+h) - observation.state(t)`，不是相邻帧增量
 | M05 两候选部署前审计（10-06） | 全 9,234 窗复算与训练期一致；旧 offset=5 异常门接受 68.15% / 64.50%；Live Dry-Run 各 10 次，通过 8 / 7 次，被拒均为 Roll / Pitch，已提交的 15 次全部 sent=false、状态变化 0 | 能放宽异常门；已满足真实运动前置条件（力安全自检未完成、活动侧不在 W，真实单步未发送） |
 | severe-mask 单步与短段连续空载 | 有受限单步及约 6 步、约 20 步尝试；出现同向漂移并触及当次范围限制 | 已完成自主 A→B；临时试跑界面仍为当前正式功能 |
 | GPT 视觉抓取 | 实验结束，未成功抓起，独立日志保留，实验代码撤回 | 形成了同步成功示教；真实接触停止或恒力控制已验收 |
-| M06 7 维基线连续实机（10-10，旧水平 W） | 全速 612 步、示范速度 891 步，全部被接受执行；两次都在 Roll 约 26～34° 回转、偏出示范范围后卡住，未碰零件 | 能据此评价抓取能力：当时夹爪命令实际未下发（见[台账 B17](/notes/2026/09/29/micromani-research-status/#B17)） |
+| M06 7 维基线连续实机（10-10，旧水平 W） | 全速 612 步、示范速度 891 步，全部被接受执行；两次都在 Roll 约 26～34° 回转、偏出示范范围后卡住，未碰零件 | 评价抓取能力：当时夹爪命令实际未下发（见[台账 B17](/notes/2026/09/29/micromani-research-status/#B17)） |
 | M08 连续实机（10-11，竖直 W） | 约 9 次运行：基线第 21 轮在一个零件位置完成一次完整抓放；不给状态一次重试夹起后被误停；其余合空、未降到位或碰歪零件 | 自主抓放成功率；成功不代表模型会按零件位置对准，三个位置合夹爪的点几乎相同 |
 
 ACT 证据见[阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)和[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)，GPT 见[专项复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/)。限幅后的实际运动与原始预测轨迹不同；软件保护测试、无动作试跑、空载运动和任务成功必须分开计数。
