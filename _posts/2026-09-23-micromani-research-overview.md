@@ -1,7 +1,7 @@
 ---
 title: "MicroMani 科研记录总览：研究主线、问题状态与阶段索引"
 date: "2026-09-23"
-last_modified_at: "2026-10-10"
+last_modified_at: "2026-10-11"
 image: /assets/uploads/micromani-global-current-setup-2026-09-23.jpg
 description: "科研记录本入口：研究问题与路线、目前学到了什么、卡在哪里，以及全部阶段记录的时间线。"
 category: 笔记
@@ -10,7 +10,7 @@ tags: [科研记录, MicroMani, 机器人, 具身智能, 数据采集, ACT, 运�
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-10。**一句话现状：ACT 离线已经明显优于“原地不动”，但还没有一次自主抓放；10 月 8 日回工作原点时出现危险的多圈规划，实机操作全部暂停，采集软件的修复也还在等新录制验证。
+**更新至 2026-10-11。**一句话现状：ACT 离线已经明显优于“原地不动”，但还没有一次自主抓放；10 月 8 日回工作原点时出现危险的多圈规划，实机操作全部暂停，采集软件的修复也还在等新录制验证。
 
 ## 研究问题与路线
 
@@ -26,7 +26,7 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 4. **部署要频繁重新观察。**一次预测执行得越久误差越大，第一版取每次预测的第 6 步目标，并尽量每步都重新观察、重新推理。（[阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)）
 5. **旧模型上机会同向漂移。**限幅下连续执行约 20 步，动作一直朝同一方向累积，直到碰到试验范围。（[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)）
 6. **任务成功不等于数据合格。**一条抓放成功的示教，放置阶段的夹爪对齐仍然超限；后来又发现夹爪动作没有按帧时刻取值。关键动作阶段的时间对齐比平均迟帧率更重要。（[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)）
-7. **迟帧有多个来源。**已定位的有垃圾回收长暂停与编码积压、组帧时反复读配置；“重启软件后迟帧明显下降”也出现过多次，原因还没查清。（[阶段一](/notes/2026/09/20/micromani-research-log/)、[阶段二](/notes/2026/09/21/micromani-standardized-data-and-training/)、[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)）
+7. **迟帧有多个来源。**已定位的有垃圾回收长暂停与编码积压、组帧时反复读配置；“重启软件后迟帧明显下降”也出现过多次，原因还没查清。10 月 9 日又定位到一个：实时状态包携带越积越多的动作历史，并在夹爪反馈共用的锁里序列化，组帧主要卡在等夹爪反馈；历史随运行累积、重启后清空，可能也解释了“重启后变好”（推断，未单独验证）。（[阶段一](/notes/2026/09/20/micromani-research-log/)、[阶段二](/notes/2026/09/21/micromani-standardized-data-and-training/)、[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)）
 8. **“完成”和“基准”都要验证，不能假设。**旧软件把“寻零指令被接受”当成“寻零完成”，存错了参考点；10 月 8 日保存的工作原点和控制卡当前计数不在同一基准上，规划出了约 4.8 圈的转动。（[寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/)、[多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)）
 9. **单一视角看不出高度。**GPT 视觉抓取看不清夹爪尖与零件的接触几何，没能抓起零件；之后把顶部相机改成能看出高度差的斜侧视角。（[GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/)、[相机改位](/notes/2026/10/08/micromani-global-camera-relayout/)）
 
@@ -58,3 +58,4 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 | 10-09 | [踩坑：Omega.7 主手重力补偿在边缘抽搐与开机标定](/notes/2026/10/09/micromani-omega-calibration-twitch/) | 手柄放进标定孔重新标定后消失；单次结果，原因为推断 |
 | 10-08～09 | [新视角试采的迟帧问题与采集链路修复](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) | 新视角试采迟帧 11–55%，修复后首条降到 0.24%；只有一条，后来也作废 |
 | 10-09～10 | [采集完整性审计：夹爪动作时标与录制起点门槛](/notes/2026/10/10/micromani-collection-integrity-audit/) | 发现四处“看起来完整、实际不对”的问题并修复加载；合格 probe 仍为 0 |
+| 10-09（10-10 提交） | [录制迟帧与控制连接异常排查：从短等待调度到遥测历史序列化](/notes/2026/10/11/micromani-late-frame-root-cause/) | 迟帧主要卡在等夹爪反馈；实时历史在共用锁内序列化是主要瓶颈，修正后单条 3/1274，但非受控对照、该条已作废；另修回 W 遥测停更和录制启动续期超时 |
