@@ -32,7 +32,7 @@
 
 ## MicroMani 科研记录本的会话交接
 
-- 请求“更新科研记录本”“同步科研进展”“整理会话后归档”，或本次任务已要求科研收尾时，进入科研模式：先读 `.agents/skills/blog-writing/SKILL.md`，再读 `.agents/skills/blog-writing/references/research-notebook.md`，不得只套用普通写作流程。
+- 请求“更新科研记录本”“同步科研进展”“整理会话后归档”，或本次任务已要求科研收尾时，进入科研模式：先读 `.agents/skills/blog-writing/SKILL.md`，再读 `.agents/skills/blog-writing/references/research-notebook.md`，不得只套用普通写作流程。正文按其中“正文写法”：先写发现、按问题组织，提交号、测试数和时间戳进附录，台账每项一行。
 - 三个入口为 `_posts/2026-09-23-micromani-research-overview.md`（总览）、`_posts/2026-09-29-micromani-research-status.md`（问题与验收台账）、`_posts/2026-09-29-micromani-experiment-register.md`（实验与数据索引）。接续课题先读三者，再按编号和证据链接深读相关原文；全局审查覆盖完整相关范围，不以节省调用为由省略证据。
 - 收尾时把新增事实、改动、测试、失败、决定和待办对照旧记录去重；更新相关原文及受影响的索引。有新阶段再建文章，没有新证据不制造新文章，不复制整张主线表到所有页面。
 - “更新科研记录本”包含关联阶段/专题、总览时间线、台账项及必要实验索引的联动维护；不授权改首页、主题、权限、部署或无关文章。只有入口变化才调整记录页导航。
