@@ -8,7 +8,7 @@ tags: [科研记录, MicroMani, 机器人, 运动控制, 机械寻零, HAL]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-> **事件日期：**2026-09-22～23　**整理：**09-23，09-29 补记，后记 10-10　**关联台账：**[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A05](/notes/2026/09/29/micromani-research-status/#A05)、[A06](/notes/2026/09/29/micromani-research-status/#A06)、[A07](/notes/2026/09/29/micromani-research-status/#A07)、[A08](/notes/2026/09/29/micromani-research-status/#A08)、[B03](/notes/2026/09/29/micromani-research-status/#B03)、[B04](/notes/2026/09/29/micromani-research-status/#B04)
+> **事件日期：**2026-09-22～23　**整理：**09-23，09-29 补记，后记 10-10、10-12　**关联台账：**[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A05](/notes/2026/09/29/micromani-research-status/#A05)、[A06](/notes/2026/09/29/micromani-research-status/#A06)、[A07](/notes/2026/09/29/micromani-research-status/#A07)、[A08](/notes/2026/09/29/micromani-research-status/#A08)、[B03](/notes/2026/09/29/micromani-research-status/#B03)、[B04](/notes/2026/09/29/micromani-research-status/#B04)
 
 **本篇结论：**旧版软件把“控制卡接受了寻零指令”当成“寻零已经完成”，轴还在运动时就读取当前位置，把这个中途的脉冲存成了机械参考点。这能解释部分“寻零后零点变了”的现象。可靠的完成判断需要四层同时成立：命令被接受、控制卡报告寻零完成、轴已停止、软件收到完成之后的新鲜静止反馈。相关修复已提交到公开源码，但还没有完整的真机验收；X/Z 找不到 HOME 是另一个问题，仍未解决。
 
@@ -167,6 +167,20 @@ HAL/backend 读取此刻 pulse
 ## 后记（2026-10-10）
 
 10 月 8 日回工作原点时出现 Roll 约 −1732° 的危险多圈规划。那次调用的是返回已保存 W 的 `home_origin_side`，不是本文讨论的机械寻零搜索，属于另一条路径；单独记录在[回工作原点时的危险多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)，台账 [A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)。
+
+## 后记（2026-10-12）：四层判据有了，第四层却会被一次读取异常提前打断
+
+本文讲的旧问题是“没完成就当成完成”。10 月 8 日下午的一次机械寻零暴露了反过来的问题：**已经完成了，后端却判成失败。**依据是 Codex 10-12 整理的该会话材料（会话记录、当时读到的 HAL / backend 日志、源码和提交差异）。
+
+**现场。**15:08 对 Card 1（HAL `left`）的 Roll、Pitch、Yaw 做严格 ORG 寻零，三轴依次搜索，每轴都有 `home_start` 和 `home_done`，整次应答 `ok=true`，约 20.4 s；Roll 从 −5977 走到 −71891 pulse（界面约 −39.5°）。紧接着后端在“等完成后的新鲜静止反馈”时报“控制卡采样时间过期或不可用”，界面显示机械寻零失败，所选轴的参考没有确认。也就是机构动完了，参考却没记上。
+
+**原因。**后端本来有一个最多等 2 秒的循环，等一份完成之后的、新鲜的、静止的状态再保存参考。但循环里的 `motion_state()` 遇到无效采样时会**抛异常**，异常直接跳出循环，后面的期限、时间戳和静止判断都没机会执行。所以“源码里有两秒等待”并不等于程序真的会等。HAL 寻零结束时会发一份命令侧快照，它的采样时间为 0，表示“这不是硬件实测”；这是本文第二节要求的真实性保护，不能靠给它补上当前时间来消除报错。失败那一帧的完整数据没有保存，所以“就是时间为 0 的那一帧”是与源码吻合的解释，没有直接抓包证实。
+
+**修复**（[`a093a8b`](https://github.com/ccoxo/E2EAPP_MicroMani/commit/a093a8b26f98b59bd49ff4c3a5077b9b08cde4a5)，只改 `home_motion_side()`）：只对“采样时间过期或不可用”这一种异常，在原来的 2 秒期限内每 20 ms 重读一次状态；每次重读前后都检查急停和停止代际；期限到了仍没有合格反馈就报失败、不写参考。其他通信错误照旧立即报错。重试的是**读状态**，不会重新发一次寻零命令。新鲜度门限、HAL 实例核对、只更新所选轴这些条件都没动。
+
+**验证。**新增 4 个场景：短暂异常后恢复、持续无有效采样到期失败、其他通信错误不重试、等待中插入急停。修复前先跑是 3 失败 1 通过（“其他错误直接报错”本来就对），修复后相关三个测试文件 137 项通过；10 月 12 日从暂存区导出独立副本再跑一次，仍是 137 项（两次是同一组测试，不能相加）。这些都是替身 HAL 上的离线测试。补丁 10 月 8 日随后台重启加载过，但之后对目标臂 Card 0 的寻零没有成功提交（见[多圈规划后记](/notes/2026/10/08/micromani-work-origin-multiturn/)），所以**修复后的实机寻零还没有做过一次**。提交 10 月 12 日创建并已推送到远端 `xie`。
+
+这项修复不涉及：普通回 W 的大位移拒绝（[A04](/notes/2026/09/29/micromani-research-status/#A04)）、计数基准（[A09](/notes/2026/09/29/micromani-research-status/#A09)）、回 W 期间持锁导致的遥测停更（后来另一轮 HAL 修复，见[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)、[B15](/notes/2026/09/29/micromani-research-status/#B15)）。按错误文本识别可恢复情况是局部做法，以后改了错误文案要同步检查这里。台账记为 [A11](/notes/2026/09/29/micromani-research-status/#A11)。
 
 <details markdown="1">
 <summary>附录：版本对照、状态可信度修复与证据来源</summary>
