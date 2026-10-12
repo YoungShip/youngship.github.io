@@ -1,7 +1,7 @@
 ---
 title: "MicroMani 科研记录总览：研究主线、问题状态与阶段索引"
 date: "2026-09-23"
-last_modified_at: "2026-10-12"
+last_modified_at: "2026-10-13"
 image: /assets/uploads/micromani-global-current-setup-2026-09-23.jpg
 description: "科研记录本入口：研究问题与路线、目前学到了什么、卡在哪里，以及全部阶段记录的时间线。"
 category: 笔记
@@ -10,7 +10,7 @@ tags: [科研记录, MicroMani, 机器人, 具身智能, 数据采集, ACT, 运�
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-12。**一句话现状：ACT 在硬件左臂上第一次完成了一次实机抓放，但只是零件正好放在模型固定会去的位置，模型还没学会按零件位置对准；下一步先采固定位置的数据。硬件右臂的多圈规划问题仍未解决。
+**更新至 2026-10-13。**一句话现状：零件固定在同一点时，ACT 已能在硬件左臂上稳定抓放（示范速度 7 次成功 6 次，加速执行后约 13 秒一次、15 次成功 8 次），但模型仍不看零件，失败多是走到另一个固定落点；下一步补采带偏差和重试的示范。硬件右臂的多圈规划问题仍未解决。
 
 ## 研究问题与路线
 
@@ -31,12 +31,15 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 9. **单一视角看不出高度。**GPT 视觉抓取看不清夹爪尖与零件的接触几何，没能抓起零件；之后把顶部相机改成能看出高度差的斜侧视角。（[GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/)、[相机改位](/notes/2026/10/08/micromani-global-camera-relayout/)）
 10. **示教“做法一致”比条数重要。**D05 只用 40 条仍比 hold 好约 36%；y2144 同样 40 条只好约 16%，原因是 Pitch 卡在软限位上来回跳、每条要大转 Roll 并常回调、抓取角度前后两种。（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）
 11. **模型没学会“看着零件对准”。**竖直工作原点重采 50 条后，基线和 6 种改法都在 22～24%，起点时零件放在哪里模型给出的动作几乎一样；实机上它总往同一个点去抓。（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）
+12. **固定位置能把一条路线学准，但模型仍在“背路线”。**固定位置 39 条训出的 fixed2 在实机上按示范速度 7 次成功 6 次；合夹爪点成簇出现、不随零件移动，失败多落在另一个固定点。全局相机被碰歪后落点整体平移，模型可能主要靠全局画面定路线（推断）。（[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/)）
+13. **动作标签是超前的目标，执行方式要配合它。**数据里的动作是主手发出的目标，比实际位置超前约 0.3 秒；直接缩短执行步长会把超前一次次叠加、越走越快。ACT 的时间集成避免了这一点，单次抓放从 25～37 秒缩到约 13 秒。（[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/)）
+14. **迟帧还有一个来源是后端主进程停顿。**相机改到独立进程后，同一时刻相机在正常拍、后端却停了约 1 秒；对齐超限则全部来自夹爪和运动控制，相机一次没有。（[迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/)）
 
 ## 现在卡在哪里
 
 1. **实机安全：**硬件右臂保存的工作原点和控制卡计数基准失配，普通回工作原点也没有“转太多就拒绝”的检查，仍未解决（[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)）。10 月 10 日起用户决定在硬件左臂上恢复 ACT 实机（左臂回 W 和遥操作采集 10-09 晚已在进行），靠实机脚本里的高度、范围和力限保护（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）。
 2. **采集验收：**按 V1 流程合格的 probe 仍为 0。修复加载后已录 D07、D08 两批，还没用它们核对起点门槛和夹爪时标；D07 录制中后端换过三个版本，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/)（[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C09](/notes/2026/09/29/micromani-research-status/#C09)、[C16](/notes/2026/09/29/micromani-research-status/#C16)）。
-3. **模型上机：**夹爪接通后，第一次完成了一次完整抓放，但只是位置巧合；模型不按零件位置调整，先用固定位置数据把一条路线学准（[E15](/notes/2026/09/29/micromani-research-status/#E15)、[E18](/notes/2026/09/29/micromani-research-status/#E18)）。
+3. **模型上机：**固定位置上已能稳定抓放，但模型不按零件位置调整，失败集中在第二个固定落点；下一步补采零件放偏和失败重试的示范（[E15](/notes/2026/09/29/micromani-research-status/#E15)、[E18](/notes/2026/09/29/micromani-research-status/#E18)、[E22](/notes/2026/09/29/micromani-research-status/#E22)）。
 
 具体顺序和通过条件见台账的[当前决定与验收顺序](/notes/2026/09/29/micromani-research-status/#acceptance)。
 
@@ -66,3 +69,5 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 | 10-09（10-10 提交） | [录制迟帧与控制连接异常排查：从短等待调度到遥测历史序列化](/notes/2026/10/11/micromani-late-frame-root-cause/) | 迟帧主要卡在等夹爪反馈；实时历史在共用锁内序列化是主要瓶颈，修正后单条 3/1274，但非受控对照、该条已作废；另修回 W 遥测停更和录制启动续期超时 |
 | 10-10～11 | [阶段九：y2144 诊断、竖直工作原点与第一次实机抓放](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) | y2144 差在数据不一致而非条数；竖直原点重采后 7 种训练做法都不会按零件位置对准；夹爪接通后完成一次抓放，属位置巧合 |
 | 10-10～11 | [实机策略控制与采集中的五个软件问题](/notes/2026/10/11/micromani-live-control-software-fixes/) | 重复使能被拒、Pitch 0～0、急停后夹爪命令被静默跳过挡住连续控制；采集中两项提示一真一误报；三项提交 10-12 已推送 |
+| 10-11～13 | [阶段十：固定位置数据、fixed2 实机与时间集成](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) | 固定位置 39 条训出的 fixed2 示范速度 7 次成功 6 次；时间集成约 13 秒一次、15 次成功 8 次；失败多落在第二个固定点，标记已排除，全局相机移位是主要嫌疑 |
+| 10-11～12 | [专题：后端主进程停顿、共享内存相机采集与策略请求提速](/notes/2026/10/12/micromani-backend-stall-shm-capture/) | 对齐超限来自夹爪和运动控制；相机卡顿实为主进程停顿，相机改独立进程采集并默认启用；夹爪后台下发后动作请求约 120→36 ms |

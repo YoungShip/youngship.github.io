@@ -11,7 +11,7 @@ tags: [科研记录, MicroMani, 科研索引]
 
 **更新至 2026-10-13。**每个问题占一行，只写现在的状态和下一步；过程、证据和历次补记在“出处”链接的原文里。编号固定不变，新问题接在各组末尾。
 
-**当前最要紧的：**模型不会按零件位置对准（[E18](#E18)），实机只有一次属于位置巧合的抓放（[E15](#E15)）；下一步采固定位置数据。硬件右臂的多圈规划（[A04](#A04)、[A09](#A09)）仍未解决，10 月 10 日起只在硬件左臂上恢复实机。采集完整性修复已推送到远端，但还没用新数据核对；10-08、10-09 两批工作区改动 10-13 也已拆分提交并推送（[C04](#C04)、[C09](#C09)、[C16](#C16)）。
+**当前最要紧的：**固定位置上 fixed2 已能稳定抓放（示范速度 7 次成功 6 次，时间集成 15 次成功 8 次，[E15](#E15)），但模型仍不看零件，失败多是走到另一个固定落点（[E18](#E18)、[E22](#E22)）；下一步补采带偏差和重试的示范。硬件右臂的多圈规划（[A04](#A04)、[A09](#A09)）仍未解决，只在硬件左臂上做实机。主进程停顿还有读写配置文件这个来源没修（[C26](#C26)）。
 
 ## 状态怎么读
 {: #status-tags }
@@ -74,6 +74,8 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="B19"></a>**B19** | 配置文件被占用致主手连接 / 断开失败 | 临时方案 | RDC 子进程占用 `config.json`，保存被拒、前端报 Failed to fetch；重启 RDC 恢复一次后复发；重试逻辑 10-13 已提交推送（`d45d421`）。10-08 ACT 实机时已出现同类 `WinError 5`（动作已下发后保存失败返回 500），替换重试和“动作可能已开始”的 503 是那时的前序 Codex 会话写的 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
 | <a id="B20"></a>**B20** | DDS 应答返回约 300 ms | 未解决 | 10-08 执行循环里每步约 290 ms 等应答，HAL 约 17 ms 已回复；延长发现、关 OpenMP 忙等、换 Python、请求后等待、加大应答历史均无效；连续执行停在约 2.97 Hz | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
 | <a id="B21"></a>**B21** | Health 主题收不到 | 现场通过（单次） | 接收历史深度 1 改为 32 后三次只读连接都在 0.4 s 内收到；为何深度 1 收不到未从机制上查清 | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
+| <a id="B22"></a>**B22** | 策略动作请求被夹爪串口命令拖慢 | 现场通过（单次） | 一次请求约 120 ms、夹爪占约 93 ms；带 `gripperAsync` 时夹爪后台下发、只留最新目标（`4c98be4`），降到约 36 ms，15 次时间集成实机正常 | [迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
+| <a id="B23"></a>**B23** | 策略请求偶发 503“运动状态通道忙” | 临时方案 | 通道容量 2，忙时拒绝且未执行；实机脚本跳过该步、连续 5 次才停；触发条件未查 | [迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
 
 ## C. 数据采集与系统稳定性
 {: #C }
@@ -83,7 +85,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C01"></a>**C01** | 三路相机 30 FPS 与设备绑定 | 真机验收通过 | 120 秒统计和后续录制均稳定约 30 FPS；更长时间、更高负载未覆盖；09-22 曾因默认绑定被覆盖失效（[C24](#C24)） | [阶段一](/notes/2026/09/20/micromani-research-log/) |
 | <a id="C02"></a>**C02** | 保存的视频周期卡顿 | 现场通过（单次） | 原因是垃圾回收长暂停和编码积压；编码隔离后实机录制无可见卡顿 | [阶段一](/notes/2026/09/20/micromani-research-log/) |
 | <a id="C03"></a>**C03** | 结束、丢弃、复位竞态 | 已修改待验收 | 多处时序已修；10-09 改为尾帧排空后再停夹爪采样；10-11 提交、10-12 已推送，待实测 | [阶段一](/notes/2026/09/20/micromani-research-log/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
-| <a id="C04"></a>**C04** | 夹爪反馈迟到与迟帧 | 已修改待验收 | 主要卡在等夹爪反馈，定位到实时历史在夹爪锁内序列化并已修正；修正后单条 3/1274（非受控、已作废），待多条录制验证 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
+| <a id="C04"></a>**C04** | 夹爪反馈迟到与迟帧 | 已修改待验收 | 主要卡在等夹爪反馈，定位到实时历史在夹爪锁内序列化并已修正；修正后单条 3/1274（非受控、已作废），待多条录制验证。10-11 另查明对齐超限只来自夹爪和运动控制，夹爪线程串行发命令、读两侧，单轮近 50 ms（见 C25） | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/)、[迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
 | <a id="C05"></a>**C05** | 录完后约 16.7 秒状态停顿 | 未解决 | 触发链路清楚（状态停顿→租约失效→急停），根因未知；后续 15 分钟监测未复发 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="C06"></a>**C06** | 成功的 767 帧示教 | 待核 | 抓放成功，但放置阶段有 3 个夹爪对齐超限点（50–63 ms），先不入训 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="C07"></a>**C07** | GPT 动作转训练标签 | 已结束 | GPT 动作未接入录制器的动作来源，随 GPT 路线结束 | [GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/) |
@@ -97,13 +99,16 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C15"></a>**C15** | 右力传感 watchdog 超时锁存 | 未解决 | 10-08 右力传感不健康、因 watchdog 超时锁存；原因待核；同日下午 COM14 端口在但无有效帧，重新插拔后恢复约 1000 Hz 并去皮通过一次，之后又因静置 Fx 抖动 0.055 N（门限 0.05）自检失败 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
 | <a id="C16"></a>**C16** | 夹爪动作未按帧时刻取值 | 已修改待验收 | 较晚的夹爪目标可能写进较早的帧；改为按时标取值，离线通过；10-11 提交、10-12 已推送。D07 录于修复后，可回查，尚未核对 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C17"></a>**C17** | 起点夹爪未张开要去遥操作页处理 | 已修改待验收 | 开始前低于 25 mm 弹窗、可一键张开（`4f41724`，10-12 已推送）；已打包，未在界面验证 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
-| <a id="C18"></a>**C18** | 复位间隙报“夹爪反馈过期” | 已修改待验收 | HAL 只在遥操作运行时读夹爪，警告全部出在复位后重启时，录制中过期为 0；遥操作停止时不再告警（`e8d1e61`），待重启后端 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
+| <a id="C18"></a>**C18** | 复位间隙报“夹爪反馈过期” | 现场通过（单次） | HAL 只在遥操作运行时读夹爪，警告全部出在复位后重启时，录制中过期为 0；遥操作停止时不再告警（`e8d1e61`）。10-11 22:12 重启后端后复位间隙未再出现，未做长时间验证 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="C19"></a>**C19** | 安全中断后重试混入上一次尝试的帧 | 已修改待验收 | y2144 ep22 实际 763 帧、记录 636 帧；10-09 22:47 起保存前核对帧数，ep22 已隔离、未入训；10-13 提交推送（`2616188`） | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C20"></a>**C20** | 录制准备阶段主从运动未锁住 | 已修改待验收 | 10-09 22:11 起准备阶段 HAL 不放行运动与夹爪命令，就绪后放行；部署时未做实机运动测试；10-13 提交推送（`4473917`） | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C21"></a>**C21** | 悬空静置时力 / 力矩超过解锁门槛 | 未解决 | 10-09 硬件左 Fy −2.005 N、Mx 0.0274 N·m 均超；零点、线缆、自重未区分；之后锁存曾解除 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C22"></a>**C22** | 对齐超限被升级成停机（09-21 `d18b523`） | 现场通过（单次） | 有效但超限的帧照常写入并逐帧记录，缺失或真正过期仍拒绝（`cd0e259`）；09-22 一次约 3 分钟录制未再中断，长时间与双侧未验证 | [采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
 | <a id="C23"></a>**C23** | 录制未处理时回工作原点停掉夹爪反馈 | 已修改待验收 | 录制启动、进行、中断未处理、保存或丢弃中拒绝回 W（`0d21df3`，后端 409）；未做实机验证 | [采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
 | <a id="C24"></a>**C24** | 顶部相机默认绑定被旧 USB 路径覆盖 | 现场通过（单次） | 恢复按序列号认顶部、左右腕按画面确认（`6dce89f`），三路约 30 FPS；配置为何退回旧路径未查清；换口、重插、缺设备未验证 | [相机绑定恢复](/notes/2026/09/22/micromani-camera-identity-restore/) |
+| <a id="C25"></a>**C25** | 夹爪对齐上限 50 ms 常被踩线 | 临时方案 | 夹爪串口线程发命令约 28 ms、读两侧开口各约 15 ms，单轮中位约 48 ms；上限放宽到 70 ms（`6dca631`），只读参与侧才是根治，未做 | [迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
+| <a id="C26"></a>**C26** | 后端主进程周期停顿致迟帧 | 已定位 | 10-12 一次约 1 s 停顿时相机进程无停顿，卡在主进程；相机读取线程查询过密已降频（GIL 占比 82%→22%），每次请求读写配置文件未改 | [迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
+| <a id="C27"></a>**C27** | 相机共享内存独立进程采集 | 现场通过（单次） | 每相机一个子进程、共享内存传原始画面（`0e59d3c`），10-12 起默认启用（`d9315e9`）；上线后 3 条录制迟帧 0～1、一天实机正常，未做长时间采集验收 | [迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/) |
 
 ## D. 数据集与数据契约
 {: #D }
@@ -139,14 +144,19 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="E12"></a>**E12** | 旧模型连续执行 | 已结束 | 约 6 步、约 20 步后同向漂移触到范围限制，已暂停 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="E13"></a>**E13** | 旧模型完整请求耗时 | 已完成 | 四次 273–648 ms，含读图、推理和 dry-run，不是控制频率 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="E14"></a>**E14** | 实验基准变化 | 已完成 | 09-23 工作原点和相机变化、10-08 global 再变；各批数据按视角分开使用 | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)、[相机改位](/notes/2026/10/08/micromani-global-camera-relayout/) |
-| <a id="E15"></a>**E15** | 自主抓放实机验证 | 现场通过（单次） | 10-11 硬件左臂完成一次完整抓放，但零件正好在模型固定去的点；另一次夹起后被误停。成功率未建立 | [阶段八](/notes/2026/10/04/micromani-d05-day-training/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="E15"></a>**E15** | 自主抓放实机验证 | 现场通过（单次） | 10-12 fixed2 固定位置：示范速度 7 次成功 6 次，时间集成 15 次成功 8 次；零件凭感觉放在格子中间，只在同一点附近，不能推广；10-11 时只有一次位置巧合的抓放 | [阶段八](/notes/2026/10/04/micromani-d05-day-training/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)、[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) |
 | <a id="E16"></a>**E16** | standard10 hold 指标口径 | 待核 | 阶段二记 0.1543，阶段五记 0.145326，差异来源未查 | [口径待核](/notes/2026/09/29/micromani-experiment-register/#metric-caveats) |
 | <a id="E17"></a>**E17** | y2144 比 hold 只好约 16% | 已完成 | 不是条数问题（D05 抽 40 条约 36%）；原因是 Pitch 限位噪声、Roll 大转与回调、抓取角度两种做法 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
-| <a id="E18"></a>**E18** | 模型不会按零件位置对准 | 未解决 | yxp_1011_v1 上基线与 6 种改法都在 22～24%，起点预测与零件位置无关；先采固定位置数据，再考虑显式零件定位 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="E18"></a>**E18** | 模型不会按零件位置对准 | 未解决 | yxp_1011_v1 上基线与 6 种改法都在 22～24%，起点预测与零件位置无关；固定位置数据后合夹爪点仍成簇、不随零件移动；下一步补采零件放偏 1～3 mm 和失败重试的示范，再考虑显式零件定位 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)、[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) |
 | <a id="E19"></a>**E19** | M05 连续实机闭环（10-08） | 已完成 | 硬件左臂 13 段运行；屏蔽 Z 下探后 132 个动作闭合到 1.12 mm、抬升约 1.1 mm，空抓；流式执行 910 次应答、稳态约 2.97 Hz。结果含 Z 单向约束、夹爪增量累积等执行改写，不是模型原始行为 | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
+| <a id="E20"></a>**E20** | 固定位置数据五个对比模型 | 已完成 | 第二轮 fixed2 / near2 整段约 31%、第 5 步约 16%、第 1 步 −24% / −30%；加位置相近旧数据无明显收益 | [阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) |
+| <a id="E21"></a>**E21** | 时间集成执行 | 已完成 | 直接缩短步长会因动作标签超前而越走越快；k = −0.01、提前 2 帧的时间集成每步约 80 ms，单次约 13 s，15 次成功 8 次；k > 0 未试 | [阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) |
+| <a id="E22"></a>**E22** | 失败集中在第二个固定落点 | 待核 | 失败多落在偏约 3 mm、高约 1.5 mm 的另一点；白色标记离线已排除，全局相机被碰歪是主要嫌疑但无对照 | [阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) |
 
 ## 当前决定与验收顺序
 {: #acceptance }
+
+> **2026-10-13 补记：**固定位置采集、对比训练和实机测试已完成，结果见[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/)。用户决定不再精确复位全局相机，下一步补采带偏差和重试的示范；实机仍只在硬件左臂，A04、A09 的关闭条件不变。
 
 > **2026-10-11 补记：**10 月 10 日起用户决定在**硬件左臂**上恢复回 W 和 ACT 实机，重设了竖直工作原点并采了新数据，实机靠脚本里的高度、范围和力限保护；[A04](#A04)、[A09](#A09) 的关闭条件不变，硬件右臂仍不回 W、不寻零。下一步改为：固定位置采集 → 两个模型对比 → 固定位置实机 10 次（见[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)的“下一步”）。工控机日志显示 10-09 21:37 已有一次硬件左臂回 W，y2144 也在 10-09 晚录制，所以“10 月 10 日起”只对 ACT 实机成立，左臂的回 W 和遥操作采集 10-09 已在进行；何时决定恢复没有记录。
 
