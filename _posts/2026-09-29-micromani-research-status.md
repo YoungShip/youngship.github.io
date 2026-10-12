@@ -1,7 +1,7 @@
 ---
 title: "MicroMani 问题与验收台账：状态、证据与后续门槛"
 date: "2026-09-29"
-last_modified_at: "2026-10-11"
+last_modified_at: "2026-10-12"
 description: "每个问题一行：当前状态、现状与下一步、出处。查某个问题解决没有、还差什么验收，从这里开始。"
 category: 笔记
 tags: [科研记录, MicroMani, 科研索引]
@@ -9,7 +9,7 @@ tags: [科研记录, MicroMani, 科研索引]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-11。**每个问题占一行，只写现在的状态和下一步；过程、证据和历次补记在“出处”链接的原文里。编号固定不变，新问题接在各组末尾。
+**更新至 2026-10-12。**每个问题占一行，只写现在的状态和下一步；过程、证据和历次补记在“出处”链接的原文里。编号固定不变，新问题接在各组末尾。
 
 **当前最要紧的：**模型不会按零件位置对准（[E18](#E18)），实机只有一次属于位置巧合的抓放（[E15](#E15)）；下一步采固定位置数据。硬件右臂的多圈规划（[A04](#A04)、[A09](#A09)）仍未解决，10 月 10 日起只在硬件左臂上恢复实机。采集完整性修复 10-11 已在本地提交、仍未推送，也还没用新数据核对（[C04](#C04)、[C09](#C09)、[C16](#C16)）。
 
@@ -76,10 +76,10 @@ tags: [科研记录, MicroMani, 科研索引]
 
 | 编号 | 问题 | 状态 | 现状与下一步 | 出处 |
 | --- | --- | --- | --- | --- |
-| <a id="C01"></a>**C01** | 三路相机 30 FPS 与设备绑定 | 真机验收通过 | 120 秒统计和后续录制均稳定约 30 FPS；更长时间、更高负载未覆盖 | [阶段一](/notes/2026/09/20/micromani-research-log/) |
+| <a id="C01"></a>**C01** | 三路相机 30 FPS 与设备绑定 | 真机验收通过 | 120 秒统计和后续录制均稳定约 30 FPS；更长时间、更高负载未覆盖；09-22 曾因默认绑定被覆盖失效（[C24](#C24)） | [阶段一](/notes/2026/09/20/micromani-research-log/) |
 | <a id="C02"></a>**C02** | 保存的视频周期卡顿 | 现场通过（单次） | 原因是垃圾回收长暂停和编码积压；编码隔离后实机录制无可见卡顿 | [阶段一](/notes/2026/09/20/micromani-research-log/) |
 | <a id="C03"></a>**C03** | 结束、丢弃、复位竞态 | 已修改待验收 | 多处时序已修；10-09 改为尾帧排空后再停夹爪采样；10-11 本地提交、未推送，待实测 | [阶段一](/notes/2026/09/20/micromani-research-log/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
-| <a id="C04"></a>**C04** | 夹爪反馈迟到与迟帧 | 已修改待验收 | 主要卡在等夹爪反馈，定位到实时历史在夹爪锁内序列化并已修正；修正后单条 3/1274（非受控、已作废），待多条录制验证 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="C04"></a>**C04** | 夹爪反馈迟到与迟帧 | 已修改待验收 | 主要卡在等夹爪反馈，定位到实时历史在夹爪锁内序列化并已修正；修正后单条 3/1274（非受控、已作废），待多条录制验证 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/)、[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
 | <a id="C05"></a>**C05** | 录完后约 16.7 秒状态停顿 | 未解决 | 触发链路清楚（状态停顿→租约失效→急停），根因未知；后续 15 分钟监测未复发 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="C06"></a>**C06** | 成功的 767 帧示教 | 待核 | 抓放成功，但放置阶段有 3 个夹爪对齐超限点（50–63 ms），先不入训 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="C07"></a>**C07** | GPT 动作转训练标签 | 已结束 | GPT 动作未接入录制器的动作来源，随 GPT 路线结束 | [GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/) |
@@ -97,6 +97,9 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C19"></a>**C19** | 安全中断后重试混入上一次尝试的帧 | 已修改待验收 | y2144 ep22 实际 763 帧、记录 636 帧；10-09 22:47 起保存前核对帧数，ep22 已隔离、未入训；改动未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C20"></a>**C20** | 录制准备阶段主从运动未锁住 | 已修改待验收 | 10-09 22:11 起准备阶段 HAL 不放行运动与夹爪命令，就绪后放行；部署时未做实机运动测试；改动未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C21"></a>**C21** | 悬空静置时力 / 力矩超过解锁门槛 | 未解决 | 10-09 硬件左 Fy −2.005 N、Mx 0.0274 N·m 均超；零点、线缆、自重未区分；之后锁存曾解除 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="C22"></a>**C22** | 对齐超限被升级成停机（09-21 `d18b523`） | 现场通过（单次） | 有效但超限的帧照常写入并逐帧记录，缺失或真正过期仍拒绝（`cd0e259`）；09-22 一次约 3 分钟录制未再中断，长时间与双侧未验证 | [采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
+| <a id="C23"></a>**C23** | 录制未处理时回工作原点停掉夹爪反馈 | 已修改待验收 | 录制启动、进行、中断未处理、保存或丢弃中拒绝回 W（`0d21df3`，后端 409）；未做实机验证 | [采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/) |
+| <a id="C24"></a>**C24** | 顶部相机默认绑定被旧 USB 路径覆盖 | 现场通过（单次） | 恢复按序列号认顶部、左右腕按画面确认（`6dce89f`），三路约 30 FPS；配置为何退回旧路径未查清；换口、重插、缺设备未验证 | [相机绑定恢复](/notes/2026/09/22/micromani-camera-identity-restore/) |
 
 ## D. 数据集与数据契约
 {: #D }
@@ -168,6 +171,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | 工控机 MicroMani 主仓库（2026-10-09 补记） | `xie/42cce5c`（10-08），另有 33 个修改、18 个新增的未提交文件；HalServer 与后端 10-09 14:53 启动 | 只读查看提交与文件时间；未核对运行二进制对应哪份源码，未提交改动不算已验收，见[补记](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 | 工控机 MicroMani 主仓库（2026-10-10 补记） | 远端 `xie/2a99555`（10-10 推送：以 `42cce5c` 为基线拆成五个连续提交，止于 `2a99555`）；工作区另有 49 个改动 / 未跟踪文件，含 C03/C04/C09/C11/C16 完整性修复（10-09 21:06 后端已加载） | 远端分支 10-10 用 `git ls-remote` 核对；运行版本 = 已推送提交 + 未提交改动，正式采集前需冻结，见[采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | 工控机 MicroMani 主仓库（2026-10-11 补记） | 本地 `xie` 在 `2a99555` 之上新增 `e8d1e61`、`d0ec8de`、`4f41724`（按功能拆分，均未推送）；工作区仍有 32 个修改、17 个未跟踪文件，含 C03/C09/C11/C16 修复 | 三个提交各自在 HEAD 临时检出上验证；`e8d1e61` 需重启后端、`4f41724` 需刷新页面才生效，见[实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/)。同日 18:00 又本地提交四项完整性修复（`d5c694c`、`8d566ca`、`2647e07`、`fb8e86c`），`xie` 领先远端 7 个提交；19:00 左右推送失败（SSH 连接被关闭），10-11 核对远端仍为 `2a99555`；10-09 晚部署的回 W 确认重试、录制起点保持（含 HAL）、录制进度、中断丢弃四处改动仍只在工作区并在运行，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| 工控机 MicroMani 主仓库（2026-10-12 补记） | 只读核对：本地 `xie` 领先 `origin/xie` 14 个提交（10-11 记为 7 个），其中 `6dca631`（10-11 22:49）把夹爪对齐上限由 50 ms 放宽到 70 ms；09-22 的 `cd0e259`、`0d21df3`、`6dce89f`、`5f28fd3` 已在远端 | 其余新增提交未逐个核对内容和测试，由课题会话处理 |
 | 连接与寻零专题 | 公开 `xie/400cde0` 固定源码证据 | 是另一轮源码审计范围，不代表生产目录回退或正在运行该版本 |
 
 版本出处见[数据续录记录](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)、[寻零专题](/notes/2026/09/23/micromani-homing-completion-semantics/)和[HAL 专题](/notes/2026/09/29/micromani-hal-startup-recovery/)。本次只核对笔记仓库，没有重查上述机器人工作区、构建产物或设备。

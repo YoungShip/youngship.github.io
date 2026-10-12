@@ -8,7 +8,7 @@ tags: [科研记录, MicroMani, 机器人, 数据采集, 控制安全, ACT]
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-> **事件日期：**2026-09-21～22　**整理：**09-22　**关联台账：**[B07](/notes/2026/09/29/micromani-research-status/#B07)、[B08](/notes/2026/09/29/micromani-research-status/#B08)、[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C11](/notes/2026/09/29/micromani-research-status/#C11)
+> **事件日期：**2026-09-21～22　**整理：**09-22，09-29、10-12 补记　**关联台账：**[B07](/notes/2026/09/29/micromani-research-status/#B07)、[B08](/notes/2026/09/29/micromani-research-status/#B08)、[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C11](/notes/2026/09/29/micromani-research-status/#C11)
 
 **本阶段结论：**补采时的告警其实混着三类不同的问题：数据质量（反馈迟到、迟帧）、设备健康（反馈无效）和控制安全（控制权该不该撤销）。夹爪 stale 多数是“读到了但晚到”，不是硬件坏了；质量检查应由显式的参与侧决定，而不是靠运动幅度去猜；backend 代为续租降低了误断控，却带来“浏览器已冻结但连接还在”的新风险，需要独立的浏览器心跳。几项都还没有真机验收。
 
@@ -121,9 +121,15 @@ hardware emergency stop requested
 
 夹爪采样时间、录制启动和组帧配置复用的后续修改见[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/)；Omega 来源与安全续录增强见[阶段七](/notes/2026/09/29/micromani-data-lineage-and-safe-resume/)。本文的“待修改”是 9 月 22 日的状态，最新状态以台账为准。
 
+## 后记（2026-10-12）：同一天的采集中断复现
+
+第二节“夹爪 stale 是时间问题”在 9 月 22 日上午有一轮完整的现场复现：四次中断分别是夹爪晚 67.7 ms、晚 50.3 ms、HAL 选中超时占位样本、HAL 约 60 ms 没有新样本；直接原因是 `d18b523` 把对齐超限升级成了停机。修复（`cd0e259`）把测量有效和对齐合格分开，有效但超限的帧照常写入并逐帧记录；另一个提交（`0d21df3`）禁止录制未处理时回工作原点。详见[采集中断专题](/notes/2026/09/22/micromani-recording-interruption-regression/)。
+
 <details markdown="1">
 <summary>附录：测试明细</summary>
 
 9 月 21 日之后涉及回放、participation、DDS 隔离等改动的 11 个后端测试文件单独重跑为 425 passed / 0 failed；HAL 的 MotionExecutor、EmergencyStop、ControlLease、ThreadStability、WorkerResilience、ForceTareRuntime 和 ForceCore 等离线测试通过。前端：TypeScript typecheck 通过；测试 430 passed / 4 failed；lint 15 errors。
+
+> **2026-10-12 补记：**以上数字出自 9 月 22 日用户转来的另一份代码审查（审查 `bd82ee9`～`0c91cb3` 九个提交），不是本阶段改动之后重跑的结果。同一份审查里 backend 全量为 1010 passed / 78 failed，其中无控制会话返回 409、旧数据集契约等几类失败在 `dcdd1a4` 基线上就已存在。
 
 </details>
