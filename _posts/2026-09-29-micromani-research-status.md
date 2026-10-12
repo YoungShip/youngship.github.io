@@ -38,13 +38,14 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="A01"></a>**A01** | 工作原点作为统一任务起点 | 已定位 | 工作原点负责任务复位，与机械寻零、机械参考点是不同概念；已用于采集 | [阶段二](/notes/2026/09/21/micromani-standardized-data-and-training/)、[阶段三](/notes/2026/09/22/micromani-homing-reference/) |
 | <a id="A02"></a>**A02** | 右臂软件工作原点重设（09-24） | 现场通过（单次） | 新原点数值核对正确，六轴读数为 0；机械参考点仍待确认，10-08 起该 W 与计数基准失配（见 A09） | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
 | <a id="A03"></a>**A03** | 已回 W 还要再点一次 | 已修改待验收 | 后端有限等待新鲜反馈，前端接受质量报告后保留复位结果；待现场重复验证 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
-| <a id="A04"></a>**A04** | 旋转轴绕圈 / 回 W 多圈规划 | 未解决 | 10-08 普通回 W 给 Roll 规划约 −1732°，现场急停；普通回 W 没有总转动量检查。关闭条件：大位移 fail-closed 拒绝、故障注入测试、现场安全验收 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
+| <a id="A04"></a>**A04** | 旋转轴绕圈 / 回 W 多圈规划 | 未解决 | 10-08 普通回 W 给 Roll 规划约 −1732°，现场急停；普通回 W 没有总转动量检查；同日 15:23 Card 0 又被请求回 W（规划 Roll 约 −1692°），约 2 s 后急停取消，发起者不明。关闭条件：大位移 fail-closed 拒绝、故障注入测试、现场安全验收 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
 | <a id="A05"></a>**A05** | 寻零中途的 pulse 被存成参考 | 已修改待验收 | 公开源码 `400cde0` 已按“接受、完成、停止、新鲜反馈”四层判断完成；待完整真机验收 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A06"></a>**A06** | X/Z 等轴找不到 HOME | 未解决 | 会一直走到端部或超时；需核对 HOME 输入、方向、限位逻辑和轴映射 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A07"></a>**A07** | 限位端作为机械参考 | 已修改待验收 | 已有显式正限位模式（起点 EL+ 无效、终点有效且停稳）；重复定位精度未测 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A08"></a>**A08** | 顺序寻零与参考实例绑定 | 离线通过 | `c0bfbb4` 起一轴完成再启动下一轴；实例绑定检测不到计数复位（见 A09）；待现场验收 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="A09"></a>**A09** | 保存的 W 与控制卡计数基准失配 | 未解决 | 10-08 硬件右臂回 W 时当前计数为 0，W 仍是 09-24 的多圈计数；归零原因待核，右臂禁止回 W、寻零或取模修正。10-10 起只在硬件左臂恢复实机 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="A10"></a>**A10** | 硬件左臂竖直工作原点（10-11） | 现场通过（单次） | 竖直朝下、零件上方 5～10 mm，Roll 为机械原点 +93°；之后多次回 W 均为小幅移动。左臂计数基准是否连续未专门核对 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="A11"></a>**A11** | 寻零已完成却被后端判失败 | 离线通过 | 完成后第一次读到无效采样就跳出 2 秒等待；改为只对这一种异常在期限内重读（`a093a8b`，10-12 已推送），4 个新场景离线通过；修复后的实机寻零还没做过 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 
 ## B. 遥操作与控制链路
 {: #B }
@@ -52,7 +53,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | 编号 | 问题 | 状态 | 现状与下一步 | 出处 |
 | --- | --- | --- | --- | --- |
 | <a id="B01"></a>**B01** | GPT 视觉直接控制与力保护 | 已结束 | 没有抓起零件；接触停止和恒力未验收；代码已撤回，日志留档 | [GPT 复盘](/notes/2026/09/29/micromani-gpt-grasp-closeout/) |
-| <a id="B02"></a>**B02** | 操作者侧与硬件侧映射 | 已定位 | 操作者左右与硬件左右相反；参与侧、数据契约和日志须用一致的侧别 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
+| <a id="B02"></a>**B02** | 操作者侧与硬件侧映射 | 已定位 | 操作者左右与硬件左右相反；参与侧、数据契约和日志须用一致的侧别；10-08 口头说的“硬件左臂”实指 Card 0（界面左臂），按软件命名却是 Card 1，结果 Card 1 实际做了寻零；动作前要用卡号和现场指认确认 | [阶段三](/notes/2026/09/22/micromani-homing-reference/)、[阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/)、[多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
 | <a id="B03"></a>**B03** | 主手连接副作用与失败回滚 | 已修改待验收 | 连接前检查主手与反馈新鲜度，禁止隐式使能，失败撤销连接；待现场验收 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
 | <a id="B04"></a>**B04** | 运动反馈真实性与停止结果 | 已修改待验收 | 保留真实采样时间、提高脉冲 JSON 精度、停止失败显式报错；停止能力需现场核验 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/)、[阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="B05"></a>**B05** | DDS 命令应答并发 | 离线通过 | 应答按 `request_id` 关联，未见租约请求抢走普通命令的应答 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
@@ -90,7 +91,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="C12"></a>**C12** | HAL 异常重启后的启动阻塞 | 离线通过 | 手动隔离遗留文件后恢复；自动恢复离线通过，真实异常重启未验证 | [HAL 专题](/notes/2026/09/29/micromani-hal-startup-recovery/) |
 | <a id="C13"></a>**C13** | global 相机改为斜侧视（10-08） | 已完成 | 位置定版、收尾已确认；只看两路画面的遥操作检验未做；10-08 前后数据不混用 | [相机改位](/notes/2026/10/08/micromani-global-camera-relayout/)、[新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/) |
 | <a id="C14"></a>**C14** | 首次录制冷启动导致断连 | 已修改待验收 | 前端等待 10→60 秒；10-09 续期请求发出前过期致断连，依赖改为启动时预热，原超时未复现；待现场验收 | [新视角试采](/notes/2026/10/09/micromani-collection-fixes-trial-recording/)、[迟帧排查](/notes/2026/10/11/micromani-late-frame-root-cause/) |
-| <a id="C15"></a>**C15** | 右力传感 watchdog 超时锁存 | 未解决 | 10-08 右力传感不健康、因 watchdog 超时锁存；原因待核，未发解锁或运动指令 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
+| <a id="C15"></a>**C15** | 右力传感 watchdog 超时锁存 | 未解决 | 10-08 右力传感不健康、因 watchdog 超时锁存；原因待核；同日下午 COM14 端口在但无有效帧，重新插拔后恢复约 1000 Hz 并去皮通过一次，之后又因静置 Fx 抖动 0.055 N（门限 0.05）自检失败 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/) |
 | <a id="C16"></a>**C16** | 夹爪动作未按帧时刻取值 | 已修改待验收 | 较晚的夹爪目标可能写进较早的帧；改为按时标取值，离线通过；10-11 提交、10-12 已推送。D07 录于修复后，可回查，尚未核对 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
 | <a id="C17"></a>**C17** | 起点夹爪未张开要去遥操作页处理 | 已修改待验收 | 开始前低于 25 mm 弹窗、可一键张开（`4f41724`，10-12 已推送）；已打包，未在界面验证 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="C18"></a>**C18** | 复位间隙报“夹爪反馈过期” | 已修改待验收 | HAL 只在遥操作运行时读夹爪，警告全部出在复位后重启时，录制中过期为 0；遥操作停止时不再告警（`e8d1e61`），待重启后端 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
