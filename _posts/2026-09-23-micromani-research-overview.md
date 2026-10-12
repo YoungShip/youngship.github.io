@@ -1,7 +1,7 @@
 ---
 title: "MicroMani 科研记录总览：研究主线、问题状态与阶段索引"
 date: "2026-09-23"
-last_modified_at: "2026-10-11"
+last_modified_at: "2026-10-12"
 image: /assets/uploads/micromani-global-current-setup-2026-09-23.jpg
 description: "科研记录本入口：研究问题与路线、目前学到了什么、卡在哪里，以及全部阶段记录的时间线。"
 category: 笔记
@@ -10,7 +10,7 @@ tags: [科研记录, MicroMani, 机器人, 具身智能, 数据采集, ACT, 运�
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-11。**一句话现状：ACT 在硬件左臂上第一次完成了一次实机抓放，但只是零件正好放在模型固定会去的位置，模型还没学会按零件位置对准；下一步先采固定位置的数据。硬件右臂的多圈规划问题仍未解决。
+**更新至 2026-10-12。**一句话现状：ACT 在硬件左臂上第一次完成了一次实机抓放，但只是零件正好放在模型固定会去的位置，模型还没学会按零件位置对准；下一步先采固定位置的数据。硬件右臂的多圈规划问题仍未解决。
 
 ## 研究问题与路线
 
@@ -48,6 +48,8 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 | 09-21 | [阶段二：统一工作原点、规范示教与 standard10 基线](/notes/2026/09/21/micromani-standardized-data-and-training/) | 泛化差可能来自起点不统一；统一工作原点和 26 mm 起点，整理出 standard10 |
 | 09-22 | [阶段三：从回零绕圈到逐轴机械参考点](/notes/2026/09/22/micromani-homing-reference/) | “回零”拆成三种操作；找不到原点的轴在严格条件下用限位端作参考 |
 | 09-22 | [阶段四：采集质量、参与设备与控制安全](/notes/2026/09/22/micromani-quality-and-stability/) | 告警分成数据质量、设备健康、控制安全三类；浏览器活性检测还缺 |
+| 09-22（10-12 补写） | [专题：夹爪采集中断的四次复现、判定回归与录制中回工作原点](/notes/2026/09/22/micromani-recording-interruption-regression/) | 中断的直接原因是 09-21 把对齐超限升级成停机；改为有效帧照常写入、超限逐帧记录，一次约 3 分钟录制未再中断；录制未处理时禁止回 W |
+| 09-22（10-12 补写） | [专题：顶部相机绑定被旧 USB 路径覆盖与三路相机角色恢复](/notes/2026/09/22/micromani-camera-identity-restore/) | 带序列号的顶部相机被当成左腕；恢复序列号绑定、左右腕看图确认后三路约 30 FPS（单次） |
 | 09-23 | [专题：机械寻零完成语义与原点误写](/notes/2026/09/23/micromani-homing-completion-semantics/) | 指令被接受不等于寻零完成；按四层条件判断后修复已提交，待真机验收 |
 | 09-23 | [阶段五：relative ACT、部署审计与新实验基准](/notes/2026/09/23/micromani-relative-act-new-setup/) | relative 表示首次优于 hold；部署应频繁重规划；工作原点和相机变了，旧数据只作基线 |
 | 09-26 | [阶段六：采集链路修复、旧 ACT 试跑与重新采集](/notes/2026/09/26/micromani-collection-and-act-pause/) | 旧模型上机同向漂移，暂停试跑；定位并修复一个迟帧来源，转回重新采集 |
