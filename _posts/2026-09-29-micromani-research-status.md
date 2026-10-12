@@ -46,6 +46,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="A09"></a>**A09** | 保存的 W 与控制卡计数基准失配 | 未解决 | 10-08 硬件右臂回 W 时当前计数为 0，W 仍是 09-24 的多圈计数；归零原因待核，右臂禁止回 W、寻零或取模修正。10-10 起只在硬件左臂恢复实机 | [多圈规划](/notes/2026/10/08/micromani-work-origin-multiturn/)、[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="A10"></a>**A10** | 硬件左臂竖直工作原点（10-11） | 现场通过（单次） | 竖直朝下、零件上方 5～10 mm，Roll 为机械原点 +93°；之后多次回 W 均为小幅移动。左臂计数基准是否连续未专门核对 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="A11"></a>**A11** | 寻零已完成却被后端判失败 | 离线通过 | 完成后第一次读到无效采样就跳出 2 秒等待；改为只对这一种异常在期限内重读（`a093a8b`，10-12 已推送），4 个新场景离线通过；修复后的实机寻零还没做过 | [寻零语义](/notes/2026/09/23/micromani-homing-completion-semantics/) |
+| <a id="A12"></a>**A12** | 旋转软限位以机械参考点为基准 | 已定位 | 10-08 硬件左 Roll 在工作角度约 38° 处被拒（界面配置写 95°）：限位 = 机械软限位 ∩（`homeReference` ＋ 配置范围），不是相对工作原点；该轴参考在当前 HAL 实例未逐轴确认，限位计算也不检查这一点 | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
 
 ## B. 遥操作与控制链路
 {: #B }
@@ -70,7 +71,9 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="B16"></a>**B16** | 策略接口重复使能导致连续动作被拒 | 现场通过（单次） | 已使能时不再重复使能（`d0ec8de`，10-12 已推送）；两天约 11 次实机运行正常，未做专门验收 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="B17"></a>**B17** | 策略接口在夹爪开关关闭时静默跳过夹爪 | 临时方案 | 急停会关掉夹爪使能，之后模型的夹爪目标不下发；实机脚本补发使能命令绕过，主程序未改 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
 | <a id="B18"></a>**B18** | Pitch 软限位 0～0 使 HAL 拒绝所有目标 | 临时方案 | HAL 要求最小值小于最大值；改为 ±0.1° 等效锁住 | [实机软件专题](/notes/2026/10/11/micromani-live-control-software-fixes/) |
-| <a id="B19"></a>**B19** | 配置文件被占用致主手连接 / 断开失败 | 临时方案 | RDC 子进程占用 `config.json`，保存被拒、前端报 Failed to fetch；重启 RDC 恢复一次后复发；重试逻辑在工作区未提交 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/) |
+| <a id="B19"></a>**B19** | 配置文件被占用致主手连接 / 断开失败 | 临时方案 | RDC 子进程占用 `config.json`，保存被拒、前端报 Failed to fetch；重启 RDC 恢复一次后复发；重试逻辑在工作区未提交。10-08 ACT 实机时已出现同类 `WinError 5`（动作已下发后保存失败返回 500），替换重试和“动作可能已开始”的 503 是那时的前序 Codex 会话写的 | [采集审计](/notes/2026/10/10/micromani-collection-integrity-audit/)、[D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
+| <a id="B20"></a>**B20** | DDS 应答返回约 300 ms | 未解决 | 10-08 执行循环里每步约 290 ms 等应答，HAL 约 17 ms 已回复；延长发现、关 OpenMP 忙等、换 Python、请求后等待、加大应答历史均无效；连续执行停在约 2.97 Hz | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
+| <a id="B21"></a>**B21** | Health 主题收不到 | 现场通过（单次） | 接收历史深度 1 改为 32 后三次只读连接都在 0.4 s 内收到；为何深度 1 收不到未从机制上查清 | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
 
 ## C. 数据采集与系统稳定性
 {: #C }
@@ -127,7 +130,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="E03"></a>**E03** | standard10 relative ACT | 已完成 | 30 步 L1 0.1315，优于 hold 0.1453 和 absolute 0.2174；首步仍弱于 hold | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
 | <a id="E04"></a>**E04** | usable53 relative + 时序过滤 | 已完成 | 30 步 L1 0.1258→0.1238，首步仍弱于 hold；只有一次对照 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
 | <a id="E05"></a>**E05** | strict23 与 usable53 对比 | 待核 | 两者验证集不同，不能直接比；需固定同一验证集重做 | [阶段六](/notes/2026/09/26/micromani-collection-and-act-pause/) |
-| <a id="E06"></a>**E06** | 109 条历史数据长训 | 已完成 | M05 30 步 0.0888、首步 0.0149，均优于 hold；无动作 Dry-Run 完成，真实单步未发送 | [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
+| <a id="E06"></a>**E06** | 109 条历史数据长训 | 已完成 | M05 30 步 0.0888、首步 0.0149，均优于 hold；无动作 Dry-Run 完成，真实单步未发送；10-08 晚已连续上实机，见 [E19](#E19) | [阶段八](/notes/2026/10/04/micromani-d05-day-training/) |
 | <a id="E07"></a>**E07** | chunk 执行与重规划 | 已完成 | 开环越长越差；取第 6 步（offset=5）作候选，时间平滑无收益 | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
 | <a id="E08"></a>**E08** | 7D→14D 部署适配 | 离线通过 | 单元测试 9/9、1,269 个窗口回放全部通过 | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
 | <a id="E09"></a>**E09** | standard10 无动作试跑 | 已完成 | 20 次不发送动作，完整一轮约 13.4 Hz | [阶段五](/notes/2026/09/23/micromani-relative-act-new-setup/) |
@@ -140,6 +143,7 @@ tags: [科研记录, MicroMani, 科研索引]
 | <a id="E16"></a>**E16** | standard10 hold 指标口径 | 待核 | 阶段二记 0.1543，阶段五记 0.145326，差异来源未查 | [口径待核](/notes/2026/09/29/micromani-experiment-register/#metric-caveats) |
 | <a id="E17"></a>**E17** | y2144 比 hold 只好约 16% | 已完成 | 不是条数问题（D05 抽 40 条约 36%）；原因是 Pitch 限位噪声、Roll 大转与回调、抓取角度两种做法 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
 | <a id="E18"></a>**E18** | 模型不会按零件位置对准 | 未解决 | yxp_1011_v1 上基线与 6 种改法都在 22～24%，起点预测与零件位置无关；先采固定位置数据，再考虑显式零件定位 | [阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/) |
+| <a id="E19"></a>**E19** | M05 连续实机闭环（10-08） | 已完成 | 硬件左臂 13 段运行；屏蔽 Z 下探后 132 个动作闭合到 1.12 mm、抬升约 1.1 mm，空抓；流式执行 910 次应答、稳态约 2.97 Hz。结果含 Z 单向约束、夹爪增量累积等执行改写，不是模型原始行为 | [D05 实机](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/) |
 
 ## 当前决定与验收顺序
 {: #acceptance }

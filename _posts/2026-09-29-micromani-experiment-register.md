@@ -92,6 +92,8 @@ relative target 是 `action(t+h) - observation.state(t)`，不是相邻帧增量
 | M05 最终 | 0.090370 | 0.015575 | 174,218 |
 | 同一 validation 的 hold | 0.152206 | 0.016524 | — |
 
+> **2026-10-12 补记：**M05 full-30 best 于 10-08 晚在硬件左臂连续实机试跑（每次只执行第 1 步、Z 只许向上、夹爪增量累积），一次空抓，见[D05 实机专题](/notes/2026/10/08/micromani-d05-act-live-empty-grasp/)（[E19](/notes/2026/09/29/micromani-research-status/#E19)）。
+
 来源：[阶段八](/notes/2026/10/04/micromani-d05-day-training/)，10 月 10 日重读两轮 `STATUS.json` 核对。契约：87 train / 22 validation，活动侧 7D、三路 640×480、relative 目标、horizon 30、batch 40，训练侧 severe-only mask、validation 不筛，归一化只用 87 条训练数据，seed 20260927。M04 父 run 到续训只继承权重、重置 AdamW 与采样器，step 连续不代表训练轨迹连续；M05 从 step 0 起全程保存完整断点，117,096 处严格恢复一次。两轮初始化方式不同，M05 更好不能单独归因于优化器是否重置。22 条 validation 已反复用于选 checkpoint，不是独立 test。与 D04 / M03 的数据和验证集不同，不直接排名。
 
 ### M06：D07（y2144）基线与去 Pitch
