@@ -1,7 +1,7 @@
 ---
 title: "MicroMani 科研记录总览：研究主线、问题状态与阶段索引"
 date: "2026-09-23"
-last_modified_at: "2026-10-13"
+last_modified_at: "2026-10-14"
 image: /assets/uploads/micromani-global-current-setup-2026-09-23.jpg
 description: "科研记录本入口：研究问题与路线、目前学到了什么、卡在哪里，以及全部阶段记录的时间线。"
 category: 笔记
@@ -10,11 +10,11 @@ tags: [科研记录, MicroMani, 机器人, 具身智能, 数据采集, ACT, 运�
 
 [科研总览](/notes/2026/09/23/micromani-research-overview/) · [问题与验收台账](/notes/2026/09/29/micromani-research-status/) · [实验与数据索引](/notes/2026/09/29/micromani-experiment-register/)
 
-**更新至 2026-10-13。**一句话现状：零件固定在同一点时，ACT 已能在硬件左臂上稳定抓放（示范速度 7 次成功 6 次，加速执行后约 13 秒一次、15 次成功 8 次），但模型仍不看零件，失败多是走到另一个固定落点；下一步补采带偏差和重试的示范。硬件右臂的多圈规划问题仍未解决。
+**更新至 2026-10-14。**一句话现状：ACT 在固定位置上已能稳定抓放，但模型仍不按零件位置对准；补采了重试和偏移示范，并按原论文配方复现 DP 和 ACT 作为基线（10-14 开训），准备 10 月 16～18 日在同样 10 个零件位置上正式比较 ACT、DP、π0.5、SmolVLA。录制中断的根因（事件循环里同步写日志）已修。
 
 ## 研究问题与路线
 
-MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取和放置几毫米大小的零件。**设备是 Omega.7 主手遥操作的双臂平台，三路相机（顶部 global 和左右腕部），模型是 ACT。第一版任务固定为从 A 点抓起、放到 B 点。
+MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取和放置几毫米大小的零件。**设备是 Omega.7 主手遥操作的双臂平台，三路相机（顶部 global 和左右腕部），模型从 ACT 起步；10 月中起在同一任务上比较 ACT、Diffusion Policy、π0.5、SmolVLA 几种动作头（[阶段十一](/notes/2026/10/13/micromani-dp-pi05-offset-data-faithful-baselines/)）。第一版任务固定为从 A 点抓起、放到 B 点。
 
 路线是：**遥操作示教 → 可追溯的数据 → ACT 离线训练 → 部署前审计 → 有边界的实机评估。**每一环都可能出问题，所以记录分成三类页面：阶段文章写过程和发现，[问题台账](/notes/2026/09/29/micromani-research-status/)写每个问题的当前状态，[实验索引](/notes/2026/09/29/micromani-experiment-register/)写数据和模型怎么比。
 
@@ -34,12 +34,16 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 12. **固定位置能把一条路线学准，但模型仍在“背路线”。**固定位置 39 条训出的 fixed2 在实机上按示范速度 7 次成功 6 次；合夹爪点成簇出现、不随零件移动，失败多落在另一个固定点。全局相机被碰歪后落点整体平移，模型可能主要靠全局画面定路线（推断）。（[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/)）
 13. **动作标签是超前的目标，执行方式要配合它。**数据里的动作是主手发出的目标，比实际位置超前约 0.3 秒；直接缩短执行步长会把超前一次次叠加、越走越快。ACT 的时间集成避免了这一点，单次抓放从 25～37 秒缩到约 13 秒。（[阶段十](/notes/2026/10/12/micromani-fixed-position-live-ensemble/)）
 14. **迟帧还有一个来源是后端主进程停顿。**相机改到独立进程后，同一时刻相机在正常拍、后端却停了约 1 秒；对齐超限则全部来自夹爪和运动控制，相机一次没有。（[迟帧与时延专题](/notes/2026/10/12/micromani-backend-stall-shm-capture/)）
+15. **主进程停顿卡在同步写日志。**10-14 用看门狗抓到调用栈：停顿多在事件循环里同步写日志，组帧也在这个循环上，停超过约 0.6 s 录制就中断；改后台写入后每条迟帧 1～21→0～1。之前怀疑的读写配置文件只要 1～4 ms。（[同步写日志专题](/notes/2026/10/14/micromani-event-loop-logging-stall/)）
+16. **离线分数会偏爱“少动”的模型。**同数据上改编配方的 DP 离线比 ACT 低 5～8 个百分点，但接近零件时 DP 的步幅接近示范、和剩余距离相关更高，ACT 的步幅明显偏小（离线统计，推断）。（[阶段十一](/notes/2026/10/13/micromani-dp-pi05-offset-data-faithful-baselines/)）
+17. **基线要照原版配方。**我们之前的 DP 和 ACT 都改了状态输入、动作表示、优化和训练长度等十来处，论文里不能称为原版基线；已按原论文与开源代码重新训练。（[阶段十一](/notes/2026/10/13/micromani-dp-pi05-offset-data-faithful-baselines/)）
 
 ## 现在卡在哪里
 
 1. **实机安全：**硬件右臂保存的工作原点和控制卡计数基准失配，普通回工作原点也没有“转太多就拒绝”的检查，仍未解决（[A04](/notes/2026/09/29/micromani-research-status/#A04)、[A09](/notes/2026/09/29/micromani-research-status/#A09)）。10 月 10 日起用户决定在硬件左臂上恢复 ACT 实机（左臂回 W 和遥操作采集 10-09 晚已在进行），靠实机脚本里的高度、范围和力限保护（[阶段九](/notes/2026/10/11/micromani-vertical-origin-first-grasp/)）。
 2. **采集验收：**按 V1 流程合格的 probe 仍为 0。修复加载后已录 D07、D08 两批，还没用它们核对起点门槛和夹爪时标；D07 录制中后端换过三个版本，见[采集审计后记](/notes/2026/10/10/micromani-collection-integrity-audit/)（[C04](/notes/2026/09/29/micromani-research-status/#C04)、[C09](/notes/2026/09/29/micromani-research-status/#C09)、[C16](/notes/2026/09/29/micromani-research-status/#C16)）。
-3. **模型上机：**固定位置上已能稳定抓放，但模型不按零件位置调整，失败集中在第二个固定落点；下一步补采零件放偏和失败重试的示范（[E15](/notes/2026/09/29/micromani-research-status/#E15)、[E18](/notes/2026/09/29/micromani-research-status/#E18)、[E22](/notes/2026/09/29/micromani-research-status/#E22)）。
+3. **模型上机：**固定位置上已能稳定抓放，但模型不按零件位置调整，失败集中在第二个固定落点；偏移和重试示范已补采，还没训练评估（[E15](/notes/2026/09/29/micromani-research-status/#E15)、[E18](/notes/2026/09/29/micromani-research-status/#E18)、[E22](/notes/2026/09/29/micromani-research-status/#E22)）。
+4. **中期对比：**原版 DP、原版 ACT 在训练中，π0.5 微调暂时只比原地不动好约 9～11%，SmolVLA 未开始；10 月 16～18 日正式实机评估，评估前工作原点、相机和零件区域不能动（[E25](/notes/2026/09/29/micromani-research-status/#E25)、[E26](/notes/2026/09/29/micromani-research-status/#E26)）。
 
 具体顺序和通过条件见台账的[当前决定与验收顺序](/notes/2026/09/29/micromani-research-status/#acceptance)。
 
@@ -71,3 +75,5 @@ MicroMani 研究的是：**用少量遥操作示教，让机械臂学会抓取�
 | 10-10～11 | [实机策略控制与采集中的五个软件问题](/notes/2026/10/11/micromani-live-control-software-fixes/) | 重复使能被拒、Pitch 0～0、急停后夹爪命令被静默跳过挡住连续控制；采集中两项提示一真一误报；三项提交 10-12 已推送 |
 | 10-11～13 | [阶段十：固定位置数据、fixed2 实机与时间集成](/notes/2026/10/12/micromani-fixed-position-live-ensemble/) | 固定位置 39 条训出的 fixed2 示范速度 7 次成功 6 次；时间集成约 13 秒一次、15 次成功 8 次；失败多落在第二个固定点，标记已排除，全局相机移位是主要嫌疑 |
 | 10-11～12 | [专题：后端主进程停顿、共享内存相机采集与策略请求提速](/notes/2026/10/12/micromani-backend-stall-shm-capture/) | 对齐超限来自夹爪和运动控制；相机卡顿实为主进程停顿，相机改独立进程采集并默认启用；夹爪后台下发后动作请求约 120→36 ms |
+| 10-13～14 | [阶段十一：DP 与 π0.5 对比、偏移与重试数据、改按原版复现基线](/notes/2026/10/13/micromani-dp-pi05-offset-data-faithful-baselines/) | 改编配方的 DP 离线比 ACT 低 5～8 个百分点、接近阶段更像在朝零件走，实机 15 次完成 9 次；π0.5 暂时只好约 9～11%；补采重试 30 条、偏移 20 条；DP 和 ACT 改按原版配方复现，已开训 |
+| 10-14 | [专题：录制中断的根因是事件循环里的同步写日志](/notes/2026/10/14/micromani-event-loop-logging-stall/) | 看门狗抓到停顿多在同步写日志；改后台写入后每条迟帧 1～21→0～1、不再中断；配置读写已排除；另修质量报告“需复核”常亮等五处界面问题 |
