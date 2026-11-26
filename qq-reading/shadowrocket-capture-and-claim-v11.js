@@ -1,4 +1,4 @@
-// Shadowrocket merged script v9: capture Cookie AND claim on init, dedup lock cleared on finish, remembers unfillable fill dates per account per day
+// Shadowrocket merged script v11: v9 + one notification per completed gift/fill/video, so progress is visible in real time. $done() stays at the end (async v10 was killed on $done - see log).
 // Trigger: http-request on eventv3.reader.qq.com/activity/new_welfare/init
 // Flow: open Welfare Centre -> init fires -> save Cookie -> claim 12 gifts
 // (scan x3 + getGift each) -> fillCheck most recent missed day -> daily
@@ -93,6 +93,7 @@ if (!cookie) {
       get(RECEIVE_CTN_URL, function (rr) {
         if (!rr || rr.code !== 0) { finish(); return; }
         ctnOk++;
+        $notification.post('QQ阅读自动领奖', '看视频 +' + (ctnOk * 5) + ' (' + ctnOk + '/4)', '');
         doCtn(n + 1);
       });
     });
@@ -114,6 +115,7 @@ if (!cookie) {
     get(FILLCHECK_URL + target + '&signType=2', function (fr) {
       fillMsg = '补签' + target + ' code=' + (fr ? fr.code : 'null');
       if (!fr || fr.code !== 0) markNofill(target);
+      $notification.post('QQ阅读自动领奖', '补签' + target + ' 完成', fillMsg);
       next();
     });
   }
@@ -131,7 +133,8 @@ if (!cookie) {
     function scanOnce() {
       if (scans >= 3) {
         get('https://ih5.reader.qq.com/api/comAds/getGift?giftId=' + gid + '&scene=1', function (res) {
-          if (res && (res.code === 0 || res.code === -5)) { ok++; } else { fail++; }
+          if (res && (res.code === 0 || res.code === -5)) { ok++; $notification.post('QQ阅读自动领奖', '已领第 ' + (idx + 1) + ' 个 (' + ok + '/' + todo.length + ')', 'code=' + res.code); }
+          else { fail++; $notification.post('QQ阅读自动领奖', '第 ' + (idx + 1) + ' 个失败', 'code=' + (res ? res.code : 'null')); }
           doGift(todo, idx + 1);
         });
         return;
